@@ -1,23 +1,25 @@
-package com.bookit.bookit.entity.tjänst;
+package com.bookit.bookit.entity.faktura;
+
 import com.bookit.bookit.entity.bokning.Bokning;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
 import java.util.UUID;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Tjänst {
+public class Faktura {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
-    private String typ; // t.ex. Basic Städning, Topp Städning, etc.
+    private String fakturanummer;
+    private Double totaltBelopp;
+    private String förfallodatum;
 
-    @OneToMany(mappedBy = "tjänst")
-    private List<Bokning> bokningar;
+    @ManyToOne
+    private Bokning bokning;
 }
