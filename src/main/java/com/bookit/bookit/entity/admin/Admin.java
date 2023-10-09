@@ -1,24 +1,32 @@
 package com.bookit.bookit.entity.admin;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.bookit.bookit.entity.user.User;
+import com.bookit.bookit.enums.UserRole;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
 @Entity
 @Data
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
-@AllArgsConstructor
-public class Admin {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-    private String name;
+public class Admin extends User{
+
+
+
+
+
+    public Admin(Integer id, String firstname, String lastname, String email, String password, UserRole role) {
+        super(id, firstname, lastname, email, password, role);
+    }
+
+/*  @OneToOne(cascade = CascadeType.ALL)
+    private User user;
+    //Kopplat till User klassen för inloggningssyfte*/
 
     //Troligen behöver komplettering
 }

@@ -16,8 +16,8 @@ import java.util.UUID;
 @AllArgsConstructor
 public class GDPR {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue
+    private Integer id;
     // fält som representerar användardata och GDPR-relaterad information
     // Kan vara kopplad till både Kund och Städare om nödvändigt
 }

@@ -1,5 +1,7 @@
 package com.bookit.bookit.entity.tjänst;
 import com.bookit.bookit.entity.bokning.Bokning;
+import com.bookit.bookit.enums.StädningsAlternativ;
+import com.bookit.bookit.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,10 +16,13 @@ import java.util.UUID;
 @AllArgsConstructor
 public class Tjänst {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-    private String typ; // t.ex. Basic Städning, Topp Städning, etc.
+    @GeneratedValue
+    private Integer id;
+
+    @Enumerated(EnumType.STRING)
+    private StädningsAlternativ städningsAlternativ; //BASIC, TOPP, DIAMANT, FÖNSTERTVÄTT
 
     @OneToMany(mappedBy = "tjänst")
     private List<Bokning> bokningar;
+
 }

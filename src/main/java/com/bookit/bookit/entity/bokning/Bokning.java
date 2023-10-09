@@ -16,8 +16,8 @@ import java.util.UUID;
 @AllArgsConstructor
 public class Bokning {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue
+    private Integer id;
 
     @ManyToOne
     private Kund kund;

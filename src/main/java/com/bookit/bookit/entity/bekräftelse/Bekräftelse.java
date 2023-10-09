@@ -15,8 +15,8 @@ import java.util.UUID;
 @AllArgsConstructor
 public class Bekräftelse {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue
+    private Integer id;
     private String meddelande;
 
     @ManyToOne

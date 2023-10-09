@@ -14,8 +14,8 @@ import java.util.UUID;
 @AllArgsConstructor
 public class Faktura {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue
+    private Integer id;
     private String fakturanummer;
     private Double totaltBelopp;
     private String förfallodatum;

@@ -14,8 +14,8 @@ import java.util.UUID;
 @AllArgsConstructor
 public class Betalning {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue
+    private Integer id;
     private Double belopp;
     private String betalningsmetod; // t.ex. kort, banköverföring, etc.
 
