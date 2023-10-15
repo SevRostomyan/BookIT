@@ -8,7 +8,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
+import java.time.LocalDateTime;
+
 
 @Entity
 @Data
@@ -27,4 +28,10 @@ public class Bokning {
 
     @ManyToOne
     private Tjänst tjänst;
+
+    private LocalDateTime bookingTime;
+
+    private String message;
+
+
 }

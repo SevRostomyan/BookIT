@@ -10,9 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class KundController {
 
 
-    @GetMapping
-    public ResponseEntity<String> sayHello(){
-        return ResponseEntity.ok("Hello from secured endpoint");
-    }
+
 
 }
