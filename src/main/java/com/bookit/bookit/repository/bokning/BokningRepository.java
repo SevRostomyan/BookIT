@@ -6,6 +6,7 @@ import com.bookit.bookit.enums.StädningsAlternativ;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Repository
 public interface BokningRepository {
@@ -16,4 +17,6 @@ public interface BokningRepository {
     boolean existsByKundAndTjänst_StädningsAlternativAndBookingTime(
             Kund kund, StädningsAlternativ städningsAlternativ, LocalDateTime bookingTime);
 
+    List<Bokning> findAllByKundId(Integer kundId);
+    List<Bokning> findAllByStädareId(Integer städareId);
 }
