@@ -3,6 +3,7 @@ package com.bookit.bookit.entity.bokning;
 import com.bookit.bookit.entity.kund.Kund;
 import com.bookit.bookit.entity.städare.Städare;
 import com.bookit.bookit.entity.tjänst.Tjänst;
+import com.bookit.bookit.enums.BookingStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -33,5 +34,7 @@ public class Bokning {
 
     private String message;
 
+    @Enumerated(EnumType.STRING)
+    private BookingStatus status;
 
 }

@@ -3,6 +3,7 @@ import com.bookit.bookit.dto.CleaningBookingRequest;
 import com.bookit.bookit.entity.bokning.Bokning;
 import com.bookit.bookit.entity.kund.Kund;
 import com.bookit.bookit.entity.tjänst.Tjänst;
+import com.bookit.bookit.enums.BookingStatus;
 import com.bookit.bookit.repository.bokning.BokningRepository;
 import com.bookit.bookit.repository.kund.KundRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -37,6 +38,8 @@ public class KundService {
         newBooking.setMessage(request.getMessage());
 
         newBooking.setBookingTime(request.getBookingTime());  // Set the booking time here
+
+        newBooking.setStatus(BookingStatus.PENDING);
 
         bokningRepository.save(newBooking);
 

@@ -37,5 +37,22 @@ public class BokningController {
         }
     }
 
+    @PostMapping("/cancelBooking")
+    public ResponseEntity<String> cancelBooking(@RequestParam Integer bookingId) {
+        bokningService.cancelBooking(bookingId);
+        return ResponseEntity.ok("Booking cancelled successfully.");
+    }
+
+
+    @GetMapping("/getCompletedBookingsByRole")
+    public ResponseEntity<List<Bokning>> getCompletedBookingsByRole(@RequestParam String role, @RequestParam Integer userId) {
+        List<Bokning> completedBookings = bokningService.getCompletedBookingsByRole(role, userId);
+        if (completedBookings != null) {
+            return ResponseEntity.ok(completedBookings);
+        } else {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
 
 }
