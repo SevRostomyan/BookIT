@@ -45,12 +45,10 @@ public class SecurityConfig {
         this.customUserDetailsService = customUserDetailsService;
         this.passwordEncoder = passwordEncoder;
     }
-
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(customUserDetailsService).passwordEncoder(passwordEncoder);  // Use the injected PasswordEncoder
     }
-
     @Bean
     public SecurityFilterChain SecurityFilterChain(HttpSecurity http) throws Exception {
         return http
@@ -58,10 +56,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         authorize -> authorize.requestMatchers(new AntPathRequestMatcher("/api/auth/**"))
                                 .permitAll()
-                                //Tillfälligt bortkommenterad
-                                .anyRequest()
-                                .authenticated()
-
+                        //Tillfälligt bortkommenterad
+                                /*.anyRequest()
+                                .authenticated()*/
                 )
                 .sessionManagement(sessionManagement ->
                         sessionManagement
@@ -69,7 +66,7 @@ public class SecurityConfig {
                 )
                 .authenticationProvider(authenticationProvider)
                 //Tillfälligt bortkommenterad
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                //.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .logout(logout -> logout.logoutUrl("/api/auth/logout")
                         .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext())
                 )

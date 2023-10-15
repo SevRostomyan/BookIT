@@ -11,7 +11,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -31,9 +30,6 @@ public class User implements UserDetails {
     private String lastname;
     private String email;
     private String password;
-
-
-
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
@@ -67,13 +63,11 @@ public class User implements UserDetails {
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return true;
+        return false;
     }
 
     @Override
     public boolean isEnabled() {
         return true;
     }
-
-
 }
