@@ -44,6 +44,7 @@ public class BokningController {
     }
 
 
+
     @GetMapping("/getCompletedBookingsByRole")
     public ResponseEntity<List<Bokning>> getCompletedBookingsByRole(@RequestParam String role, @RequestParam Integer userId) {
         List<Bokning> completedBookings = bokningService.getCompletedBookingsByRole(role, userId);
