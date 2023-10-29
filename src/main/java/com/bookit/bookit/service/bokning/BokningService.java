@@ -1,26 +1,44 @@
 package com.bookit.bookit.service.bokning;
 
 import com.bookit.bookit.entity.bokning.Bokning;
+import com.bookit.bookit.entity.user.User;
 import com.bookit.bookit.enums.BookingStatus;
 import com.bookit.bookit.repository.bokning.BokningRepository;
+import com.bookit.bookit.repository.user.UserRepository;
 import org.springframework.stereotype.Service;
 import jakarta.persistence.EntityNotFoundException;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BokningService {
 
     private final BokningRepository bokningRepository;
+    private final UserRepository userRepository;
 
-    public BokningService(BokningRepository bokningRepository) {
+    public BokningService(BokningRepository bokningRepository, UserRepository userRepository) {
         this.bokningRepository = bokningRepository;
+        this.userRepository = userRepository;
     }
 
-    public List<Bokning> getBookingsByRole(String role, Integer userId) {
-        if ("Kund".equals(role)) {
+    public String getUserRoleById(Integer userId) {
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isPresent()) {
+            return userOptional.get().getRole().name();
+        }
+        return null;
+    }
+
+    public List<Bokning> getBookingsByUserId(Integer userId) {
+        String role = getUserRoleById(userId);
+        if (role == null) {
+            return null; // or throw an exception
+        }
+
+        if ("KUND".equals(role)) {
             return bokningRepository.findAllByKundId(userId);
-        } else if ("Städare".equals(role)) {
+        } else if ("STÄDARE".equals(role)) {
             return bokningRepository.findAllByStädareId(userId);
         }
         // Add more roles as needed
@@ -39,16 +57,17 @@ public class BokningService {
         bokningRepository.save(bokning);
     }
 
-    public List<Bokning> getCompletedBookingsByRole(String role, Integer userId) {
+    public List<Bokning> getCompletedBookingsByUserId(Integer userId) {
+        String role = getUserRoleById(userId);
         if ("Kund".equals(role)) {
             return bokningRepository.findAllByKundIdAndStatus(userId, BookingStatus.COMPLETED);
         } else if ("Städare".equals(role)) {
-            // Assuming you have a similar method in your repository for Städare
             return bokningRepository.findAllByStädareIdAndStatus(userId, BookingStatus.COMPLETED);
         }
         // Add more roles as needed
         return null;
     }
+
 }
 
 

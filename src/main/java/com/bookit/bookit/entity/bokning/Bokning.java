@@ -32,7 +32,7 @@ public class Bokning {
 
     private LocalDateTime bookingTime;
 
-    private String message;
+    private String messageAtBooking;
 
     private String CustomerFeedback;
 

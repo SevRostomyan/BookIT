@@ -35,7 +35,7 @@ public class KundService {
         tjänst.setStädningsAlternativ(request.getStädningsAlternativ());
         newBooking.setTjänst(tjänst);
 
-        newBooking.setMessage(request.getMessage());
+        newBooking.setMessageAtBooking(request.getMessageAtBooking());
 
         newBooking.setBookingTime(request.getBookingTime());  // Set the booking time here
 

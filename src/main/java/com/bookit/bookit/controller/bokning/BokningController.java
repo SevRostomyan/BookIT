@@ -28,15 +28,17 @@ public class BokningController {
         return ResponseEntity.ok(kundService.bookCleaning(request));
     }
 
-    @GetMapping("/getBookingsByRole")
-    public ResponseEntity<List<Bokning>> getBookingsByRole(@RequestParam String role, @RequestParam Integer userId) {
-        List<Bokning> bookings = bokningService.getBookingsByRole(role, userId);
+    //Kunden eller städaren eller admin åt dessa kan använda nedan metod för att hämta bokningar kopplade till en specifik id
+    @GetMapping("/getBookingsByUserId")
+    public ResponseEntity<List<Bokning>> getBookingsByUserId(@RequestParam Integer userId) {
+        List<Bokning> bookings = bokningService.getBookingsByUserId(userId);
         if (bookings != null) {
             return ResponseEntity.ok(bookings);
         } else {
             return ResponseEntity.badRequest().body(null);
         }
     }
+
 
     @PostMapping("/cancelBooking")
     public ResponseEntity<String> cancelBooking(@RequestParam Integer bookingId) {
@@ -46,15 +48,16 @@ public class BokningController {
 
 
 
-    @GetMapping("/getCompletedBookingsByRole")
-    public ResponseEntity<List<Bokning>> getCompletedBookingsByRole(@RequestParam String role, @RequestParam Integer userId) {
-        List<Bokning> completedBookings = bokningService.getCompletedBookingsByRole(role, userId);
+    @GetMapping("/getCompletedBookingsByUserId")
+    public ResponseEntity<List<Bokning>> getCompletedBookingsByUserId(@RequestParam Integer userId) {
+        List<Bokning> completedBookings = bokningService.getCompletedBookingsByUserId(userId);
         if (completedBookings != null) {
             return ResponseEntity.ok(completedBookings);
         } else {
             return ResponseEntity.badRequest().body(null);
         }
     }
+
 
 
 }

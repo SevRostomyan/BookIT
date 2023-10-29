@@ -10,5 +10,5 @@ public class CleaningBookingRequest {
     private Integer userId;
     private StädningsAlternativ städningsAlternativ;
     private LocalDateTime bookingTime;
-    private String message;
+    private String messageAtBooking;
 }
