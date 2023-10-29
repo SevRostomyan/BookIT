@@ -4,6 +4,7 @@ import com.bookit.bookit.entity.bokning.Bokning;
 import com.bookit.bookit.entity.kund.Kund;
 import com.bookit.bookit.enums.BookingStatus;
 import com.bookit.bookit.enums.StädningsAlternativ;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,10 +12,11 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
-public interface BokningRepository {
-    void save(Bokning newBooking);
+public interface BokningRepository extends JpaRepository<Bokning, Integer> {
+   // void save(Bokning newBooking);
 
     boolean existsByKundAndTjänst_StädningsAlternativ(Kund kund, StädningsAlternativ städningsAlternativ);
 
@@ -33,4 +35,5 @@ public interface BokningRepository {
     List<Bokning> findAllByKundIdAndStatus(Integer kundId, BookingStatus status);
     List<Bokning> findAllByStädareIdAndStatus(Integer städareId, BookingStatus status);
 
+    Optional<Bokning> findById(Integer id);
 }

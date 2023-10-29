@@ -2,6 +2,7 @@ package com.bookit.bookit.controller.bokning;
 
 import com.bookit.bookit.dto.CleaningBookingRequest;
 import com.bookit.bookit.entity.bokning.Bokning;
+import com.bookit.bookit.enums.BookingStatus;
 import com.bookit.bookit.service.bokning.BokningService;
 import com.bookit.bookit.service.kund.KundService;
 import org.springframework.http.ResponseEntity;
@@ -39,9 +40,10 @@ public class BokningController {
 
     @PostMapping("/cancelBooking")
     public ResponseEntity<String> cancelBooking(@RequestParam Integer bookingId) {
-        bokningService.cancelBooking(bookingId);
+        bokningService.updateBookingStatus(bookingId, BookingStatus.CANCELLED);
         return ResponseEntity.ok("Booking cancelled successfully.");
     }
+
 
 
     @GetMapping("/getCompletedBookingsByRole")

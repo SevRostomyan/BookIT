@@ -34,6 +34,8 @@ public class Bokning {
 
     private String message;
 
+    private String CustomerFeedback;
+
     @Enumerated(EnumType.STRING)
     private BookingStatus status;
 

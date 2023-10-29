@@ -3,8 +3,8 @@ package com.bookit.bookit.service.bokning;
 import com.bookit.bookit.entity.bokning.Bokning;
 import com.bookit.bookit.enums.BookingStatus;
 import com.bookit.bookit.repository.bokning.BokningRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import jakarta.persistence.EntityNotFoundException;
 
 import java.util.List;
 
@@ -27,10 +27,17 @@ public class BokningService {
         return null;
     }
 
-    public void cancelBooking(Integer bookingId) {
-        bokningRepository.updateBookingStatus(bookingId, BookingStatus.CANCELLED);
+
+    //General method for changing the booking status based on the status enum including marking the booking as completed(godkänd,avslutad)
+    public void updateBookingStatus(Integer bookingId, BookingStatus newStatus) {
+        bokningRepository.updateBookingStatus(bookingId, newStatus);
     }
 
+    public void saveCustomerFeedback(Integer bookingId, String feedback) {
+        Bokning bokning = bokningRepository.findById(bookingId).orElseThrow(()->new EntityNotFoundException ("Bokning not found"));
+        bokning.setCustomerFeedback(feedback);
+        bokningRepository.save(bokning);
+    }
 
     public List<Bokning> getCompletedBookingsByRole(String role, Integer userId) {
         if ("Kund".equals(role)) {
