@@ -34,5 +34,4 @@ public class KundController {
         return ResponseEntity.ok("Feedback saved successfully.");
     }
 
-
 }
