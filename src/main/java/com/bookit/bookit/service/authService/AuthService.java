@@ -1,3 +1,4 @@
+/*
 package com.bookit.bookit.service.authService;
 
 import com.bookit.bookit.config.JwtService;
@@ -66,3 +67,4 @@ public class AuthService {
                 .build();
     }
 }
+*/

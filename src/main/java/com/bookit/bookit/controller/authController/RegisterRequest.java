@@ -1,3 +1,4 @@
+/*
 package com.bookit.bookit.controller.authController;
 
 import com.bookit.bookit.enums.UserRole;
@@ -18,3 +19,4 @@ public class RegisterRequest {
     private String password;
 
 }
+*/

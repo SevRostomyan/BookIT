@@ -1,3 +1,4 @@
+/*
 package com.bookit.bookit.controller.authController;
 
 
@@ -35,3 +36,4 @@ public class AuthController {
     }
 
 }
+*/

@@ -1,0 +1,15 @@
+# Use a base image that has JDK 19 (replace 'your-base-image' with the actual image name)
+FROM yannoff/maven:3-openjdk-19
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the pom.xml and source code
+COPY pom.xml .
+COPY src ./src
+
+# Run Maven install to download dependencies and compile the code
+RUN mvn clean install -DskipTests
+
+# Set the command to run your tests
+CMD ["mvn", "test"]

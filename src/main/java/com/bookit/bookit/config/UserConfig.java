@@ -11,7 +11,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
+//import org.springframework.security.crypto.password.PasswordEncoder;
 
 /*@EnableJpaRepositories("com.bookit.bookit.repository.user")*/
 @Configuration
@@ -31,14 +31,15 @@ public class UserConfig {
 
 
     @Bean
-    CommandLineRunner initAdmin(UserRepository userRepository, PasswordEncoder passwordEncoder, AdminRepository adminRepository) {
+    CommandLineRunner initAdmin(UserRepository userRepository, /*PasswordEncoder passwordEncoder,*/ AdminRepository adminRepository) {
         return args -> {
             if (userRepository.countByRole(UserRole.ADMIN) == 0) {
                 Admin admin = new Admin();
                 admin.setFirstname("Sevak");
                 admin.setLastname("Rostomyan");
                 admin.setEmail("sev-rostomyan@hotmail.com");
-                admin.setPassword(passwordEncoder.encode("superSecretPassword"));
+                //admin.setPassword(passwordEncoder.encode("superSecretPassword"));
+                admin.setPassword("superSecretPassword");  // TODO: Replace with own encoding logic
                 admin.setRole(UserRole.ADMIN);
                 adminRepository.save(admin);
             }
@@ -48,7 +49,8 @@ public class UserConfig {
                     kund.setFirstname("Erik");
                     kund.setLastname("Erikson");
                     kund.setEmail("erik-erikson@hotmail.com");
-                    kund.setPassword(passwordEncoder.encode("superSecretPassword"));
+                    //kund.setPassword(passwordEncoder.encode("superSecretPassword"));
+                    kund.setPassword("superSecretPassword");  // TODO: Replace with your own encoding logic
                     kund.setRole(UserRole.KUND);
                     kundRepository.save(kund);
             }
