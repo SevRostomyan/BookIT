@@ -1,9 +1,7 @@
 package com.bookit.bookit.controller.admin;
 
-import com.bookit.bookit.entity.admin.Admin;
-import com.bookit.bookit.entity.user.User;
 import com.bookit.bookit.service.admin.AdminService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.bookit.bookit.service.städare.StädareService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 //import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,9 +18,12 @@ public class AdminController {
 
     private final AdminService adminService;
 
-    public AdminController(AdminService adminService) {
+    private final StädareService städareService;
+    public AdminController(AdminService adminService, StädareService städareService) {
         this.adminService = adminService;
+        this.städareService = städareService;
     }
+
 
     @GetMapping("/dashboard")
     //@PreAuthorize("hasRole('ADMIN')")
@@ -46,4 +47,18 @@ public class AdminController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+
+
+    //Som en Admin tilldela ett städningsuppdrag till en städare
+    //OBS: servicemetoden finns i StädareService
+    @PostMapping("/assignCleaning")
+    public ResponseEntity<String> assignCleaning(@RequestParam Integer bookingId, @RequestParam Integer städareId) {
+        String result = städareService.assignCleaning(bookingId, städareId);
+        if ("Success".equals(result)) {
+            return ResponseEntity.ok("Cleaning job assigned successfully.");
+        } else {
+            return ResponseEntity.badRequest().body(result);
+        }
+
+    }
 }

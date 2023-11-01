@@ -92,6 +92,12 @@
         </dependency>-->
 
 
+     <!--   Dependency for sending mejl-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+
         <!--Dependency fpr debuging -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

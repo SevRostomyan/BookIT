@@ -1,6 +1,6 @@
 package com.bookit.bookit.entity.user;
 
-import com.bookit.bookit.entity.admin.Admin;
+import com.bookit.bookit.entity.notifications.Notifications;
 import com.bookit.bookit.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;*/
 
-import java.util.Collection;
 import java.util.List;
 
 
@@ -32,6 +31,8 @@ public class User /*implements UserDetails*/ {
     private String password;
     @Enumerated(EnumType.STRING)
     private UserRole role;
+    @OneToMany(mappedBy = "user")
+    private List<Notifications> notifications;
 
 /*    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Admin admin;*/
