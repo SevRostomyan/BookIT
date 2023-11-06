@@ -1,13 +1,10 @@
 package com.bookit.bookit.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 //Request DTO - Skickar in data till servern
 @ToString
-@NoArgsConstructor
 @Data
 public class UpdateUserDTO {
 

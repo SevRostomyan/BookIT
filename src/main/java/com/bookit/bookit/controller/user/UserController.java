@@ -1,14 +1,9 @@
 package com.bookit.bookit.controller.user;
 
-import com.bookit.bookit.dto.UpdateUserDTO;
-import com.bookit.bookit.service.user.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.*;
 
+@RestController
+@RequestMapping("/api/user")
 public class UserController {
 /*
     private final UserService userService;

@@ -1,6 +1,8 @@
 package com.bookit.bookit.entity.kund;
 import com.bookit.bookit.entity.bokning.Bokning;
-import com.bookit.bookit.entity.user.User;
+
+import com.bookit.bookit.entity.user.UserEntity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -8,17 +10,17 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Data
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class Kund extends User{
+public class Kund extends UserEntity {
 
 
     @OneToMany(mappedBy = "kund")
+    @JsonBackReference
     private List<Bokning> bokningar;
 
 /*

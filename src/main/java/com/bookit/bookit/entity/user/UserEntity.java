@@ -20,8 +20,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
-@Table(name = "user_entity")
-public class User /*implements UserDetails*/ {
+@Table
+public class UserEntity /*implements UserDetails*/ {
     @Id
     @GeneratedValue
     private Integer id;

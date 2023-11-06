@@ -1,14 +1,10 @@
 package com.bookit.bookit.service.user;
 
-import com.bookit.bookit.dto.UpdateUserDTO;
-import com.bookit.bookit.entity.user.User;
-import com.bookit.bookit.repository.user.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
+@AllArgsConstructor
 public class UserService {
 
  /*   private static UserRepository userRepository;

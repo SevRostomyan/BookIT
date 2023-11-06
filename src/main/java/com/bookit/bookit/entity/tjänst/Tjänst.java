@@ -1,7 +1,6 @@
 package com.bookit.bookit.entity.tjänst;
 import com.bookit.bookit.entity.bokning.Bokning;
 import com.bookit.bookit.enums.StädningsAlternativ;
-import com.bookit.bookit.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;

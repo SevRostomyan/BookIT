@@ -1,5 +1,7 @@
 package com.bookit.bookit.controller.kund;
 
+import com.bookit.bookit.dto.CleaningStatusRequest;
+import com.bookit.bookit.dto.FeedbackRequest;
 import com.bookit.bookit.enums.BookingStatus;
 import com.bookit.bookit.service.bokning.BokningService;
 import org.springframework.http.ResponseEntity;
@@ -16,22 +18,23 @@ public class KundController {
     }
 
     //Endpoint-en kan användas för att markera städningen som godkänd/avklarad enligt
-    @PutMapping("/updateCleaningStatus")
-    public ResponseEntity<String> updateCleaningStatusToGodkand(@RequestParam Integer cleaningId) {
-        bokningService.updateBookingStatus(cleaningId, BookingStatus.COMPLETED);
+    @PutMapping("/updateCleaningStatustoGodkand")
+    public ResponseEntity<String> updateCleaningStatusToGodkand(@RequestBody CleaningStatusRequest request) {
+        bokningService.updateBookingStatus(request.getCleaningId(), BookingStatus.COMPLETED);
         return ResponseEntity.ok("Städning godkänd");
     }
 
     @PutMapping("/updateCleaningStatusToUnderkand")
-    public ResponseEntity<String> updateCleaningStatusToUnderkand(@RequestParam Integer cleaningId) {
-        bokningService.updateBookingStatus(cleaningId, BookingStatus.UNDERKAND);  // Assuming UNDERKAND is an enum value
+    public ResponseEntity<String> updateCleaningStatusToUnderkand(@RequestBody CleaningStatusRequest request) {
+        bokningService.updateBookingStatus(request.getCleaningId(), BookingStatus.UNDERKAND);
         return ResponseEntity.ok("Städning underkänd");
     }
 
+
     @PostMapping("/saveCustomerFeedback")
-    public ResponseEntity<String> saveCustomerFeedback(@RequestParam Integer bookingId, @RequestParam String feedback) {
-        bokningService.saveCustomerFeedback(bookingId, feedback);
-        return ResponseEntity.ok("Feedback saved successfully.");
+    public ResponseEntity<String> saveCustomerFeedback(@RequestBody FeedbackRequest feedbackRequest) {
+        bokningService.saveCustomerFeedback(feedbackRequest.getBookingId(), feedbackRequest.getFeedback());
+        return ResponseEntity.ok("Tack för din feedback! ");
     }
 
 }

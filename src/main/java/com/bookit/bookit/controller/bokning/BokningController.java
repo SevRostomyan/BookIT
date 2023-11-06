@@ -1,10 +1,13 @@
 package com.bookit.bookit.controller.bokning;
 
+import com.bookit.bookit.dto.BokningDTO;
+import com.bookit.bookit.dto.BookingIdRequest;
 import com.bookit.bookit.dto.CleaningBookingRequest;
-import com.bookit.bookit.entity.bokning.Bokning;
+import com.bookit.bookit.dto.UserIdRequest;
 import com.bookit.bookit.enums.BookingStatus;
 import com.bookit.bookit.service.bokning.BokningService;
 import com.bookit.bookit.service.kund.KundService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,36 +31,34 @@ public class BokningController {
         return ResponseEntity.ok(kundService.bookCleaning(request));
     }
 
-    //Kunden eller städaren eller admin åt dessa kan använda nedan metod för att hämta bokningar kopplade till en specifik id
-    @GetMapping("/getBookingsByUserId")
-    public ResponseEntity<List<Bokning>> getBookingsByUserId(@RequestParam Integer userId) {
-        List<Bokning> bookings = bokningService.getBookingsByUserId(userId);
-        if (bookings != null) {
+    //Kunden eller städaren eller admin åt kund och städare kan använda nedan metod för att hämta bokningar kopplade till en specifik id
+    @PostMapping("/fetchBookingsByUserId")
+    public ResponseEntity<?> fetchBookingsByUserId(@RequestBody UserIdRequest request) {
+        try {
+            List<BokningDTO> bookings = bokningService.getBookingsByUserId(request.getUserId());
             return ResponseEntity.ok(bookings);
-        } else {
-            return ResponseEntity.badRequest().body(null);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
 
     @PostMapping("/cancelBooking")
-    public ResponseEntity<String> cancelBooking(@RequestParam Integer bookingId) {
-        bokningService.updateBookingStatus(bookingId, BookingStatus.CANCELLED);
+    public ResponseEntity<String> cancelBooking(@RequestBody BookingIdRequest request) {
+        bokningService.updateBookingStatus(request.getBookingId(), BookingStatus.CANCELLED);
         return ResponseEntity.ok("Booking cancelled successfully.");
     }
 
 
 
-    @GetMapping("/getCompletedBookingsByUserId")
-    public ResponseEntity<List<Bokning>> getCompletedBookingsByUserId(@RequestParam Integer userId) {
-        List<Bokning> completedBookings = bokningService.getCompletedBookingsByUserId(userId);
-        if (completedBookings != null) {
+
+    @PostMapping("/fetchCompletedBookingsByUserId")
+    public ResponseEntity<List<BokningDTO>> fetchCompletedBookingsByUserId(@RequestBody UserIdRequest request) {
+        List<BokningDTO> completedBookings = bokningService.getCompletedBookingsByUserId(request.getUserId());
+        if (completedBookings != null && !completedBookings.isEmpty()) {
             return ResponseEntity.ok(completedBookings);
         } else {
             return ResponseEntity.badRequest().body(null);
         }
     }
-
-
-
 }

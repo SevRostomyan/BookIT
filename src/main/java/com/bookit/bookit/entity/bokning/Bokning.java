@@ -4,6 +4,7 @@ import com.bookit.bookit.entity.kund.Kund;
 import com.bookit.bookit.entity.städare.Städare;
 import com.bookit.bookit.entity.tjänst.Tjänst;
 import com.bookit.bookit.enums.BookingStatus;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,6 +23,7 @@ public class Bokning {
     private Integer id;
 
     @ManyToOne
+    @JsonManagedReference
     private Kund kund;
 
     @ManyToOne
@@ -31,6 +33,8 @@ public class Bokning {
     private Tjänst tjänst;
 
     private LocalDateTime bookingTime;
+
+    private String adress;
 
     private String messageAtBooking;
 

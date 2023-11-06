@@ -1,5 +1,14 @@
 package com.bookit.bookit.controller.admin;
 
+
+import com.bookit.bookit.dto.AssignCleaningRequest;
+import com.bookit.bookit.service.städare.StädareService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import com.bookit.bookit.service.admin.AdminService;
 import com.bookit.bookit.service.städare.StädareService;
 import org.springframework.http.HttpStatus;
@@ -12,13 +21,14 @@ import java.util.Map;
 
 
 @RestController
-@RequestMapping("/admin")
+@RequestMapping("/api/admin")
 //@PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
 
     private final AdminService adminService;
 
     private final StädareService städareService;
+    @Autowired
     public AdminController(AdminService adminService, StädareService städareService) {
         this.adminService = adminService;
         this.städareService = städareService;
@@ -52,13 +62,12 @@ public class AdminController {
     //Som en Admin tilldela ett städningsuppdrag till en städare
     //OBS: servicemetoden finns i StädareService
     @PostMapping("/assignCleaning")
-    public ResponseEntity<String> assignCleaning(@RequestParam Integer bookingId, @RequestParam Integer städareId) {
-        String result = städareService.assignCleaning(bookingId, städareId);
+    public ResponseEntity<String> assignCleaning(@RequestBody AssignCleaningRequest request) {
+        String result = städareService.assignCleaning(request.getBookingId(), request.getStädareId());
         if ("Success".equals(result)) {
-            return ResponseEntity.ok("Cleaning job assigned successfully.");
+            return ResponseEntity.ok("Uppdraget är tilldelat!");
         } else {
             return ResponseEntity.badRequest().body(result);
         }
-
     }
 }

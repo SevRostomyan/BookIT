@@ -1,7 +1,7 @@
 package com.bookit.bookit.entity.notifications;
 
 import com.bookit.bookit.entity.bokning.Bokning;
-import com.bookit.bookit.entity.user.User;
+import com.bookit.bookit.entity.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,7 +25,7 @@ public class Notifications {
     private Bokning bokning;
 
     @ManyToOne
-    private User user;
+    private UserEntity user;
 
     private String subject; // Subject of the notification
 
