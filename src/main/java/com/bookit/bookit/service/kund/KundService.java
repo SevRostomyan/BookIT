@@ -45,7 +45,7 @@ public class KundService {
         newBooking.setBookingTime(request.getBookingTime());
         newBooking.setAdress(request.getAdress());
         newBooking.setMessageAtBooking(request.getMessageAtBooking());
-        newBooking.setStatus(BookingStatus.PENDING);
+        newBooking.setBookingStatus(BookingStatus.PENDING);
 
         bokningRepository.save(newBooking);
 

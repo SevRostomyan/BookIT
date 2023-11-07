@@ -4,6 +4,7 @@ import com.bookit.bookit.entity.kund.Kund;
 import com.bookit.bookit.entity.städare.Städare;
 import com.bookit.bookit.entity.tjänst.Tjänst;
 import com.bookit.bookit.enums.BookingStatus;
+import com.bookit.bookit.enums.CleaningReportStatus;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -41,6 +42,8 @@ public class Bokning {
     private String CustomerFeedback;
 
     @Enumerated(EnumType.STRING)
-    private BookingStatus status;
+    private BookingStatus bookingStatus;
 
+    @Enumerated(EnumType.STRING)
+    private CleaningReportStatus cleaningReportStatus; // New field for cleaner's report status
 }

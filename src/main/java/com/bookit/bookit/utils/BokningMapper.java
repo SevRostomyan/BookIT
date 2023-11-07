@@ -25,7 +25,8 @@ public class BokningMapper {
         dto.setAdress(bokning.getAdress());
         dto.setMessageAtBooking(bokning.getMessageAtBooking());
         dto.setCustomerFeedback(bokning.getCustomerFeedback());
-        dto.setStatus(bokning.getStatus());
+        dto.setStatus(bokning.getBookingStatus());
+        dto.setCleaningReportStatus(bokning.getCleaningReportStatus());
         return dto;
     }
 

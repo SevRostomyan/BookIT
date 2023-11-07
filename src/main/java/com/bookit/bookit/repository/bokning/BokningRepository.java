@@ -3,6 +3,8 @@ package com.bookit.bookit.repository.bokning;
 import com.bookit.bookit.entity.bokning.Bokning;
 import com.bookit.bookit.entity.kund.Kund;
 import com.bookit.bookit.enums.BookingStatus;
+import com.bookit.bookit.enums.CleaningReportStatus;
+
 import com.bookit.bookit.enums.StädningsAlternativ;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -29,11 +31,20 @@ public interface BokningRepository extends JpaRepository<Bokning, Integer> {
 
 
     @Modifying
-    @Query("UPDATE Bokning b SET b.status = :status WHERE b.id = :id")
+    @Query("UPDATE Bokning b SET b.bookingStatus = :status WHERE b.id = :id")
     void updateBookingStatus(@Param("id") Integer id, @Param("status") BookingStatus status);
 
-    List<Bokning> findAllByKundIdAndStatus(Integer kundId, BookingStatus status);
-    List<Bokning> findAllByStädareIdAndStatus(Integer städareId, BookingStatus status);
+    @Modifying
+    @Query("UPDATE Bokning b SET b.cleaningReportStatus = :cleaningReportStatus WHERE b.id = :id")
+    void updateCleaningReportStatus(@Param("id") Integer id, @Param("cleaningReportStatus") CleaningReportStatus cleaningReportStatus);
+
+
+    List<Bokning> findAllByKundIdAndBookingStatus(Integer kundId, BookingStatus bookingStatus);
+    List<Bokning> findAllByStädareIdAndBookingStatus(Integer städareId, BookingStatus bookingStatus);
+
+    // If you need to find by cleaningReportStatus, add methods for that as well
+    List<Bokning> findAllByKundIdAndCleaningReportStatus(Integer kundId, CleaningReportStatus cleaningReportStatus);
+    List<Bokning> findAllByStädareIdAndCleaningReportStatus(Integer städareId, CleaningReportStatus cleaningReportStatus);
 
     Optional<Bokning> findById(Integer id);
 

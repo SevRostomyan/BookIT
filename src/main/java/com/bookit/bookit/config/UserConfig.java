@@ -92,7 +92,7 @@ public class UserConfig {
                 newBooking.setTjänst(tjänst);
                 newBooking.setBookingTime(LocalDateTime.now());  // Hardcoded to current time
                 newBooking.setMessageAtBooking("Your message here");
-                newBooking.setStatus(BookingStatus.PENDING);  // Hardcoded status
+                newBooking.setBookingStatus(BookingStatus.PENDING);  // Hardcoded status
                 bokningRepository.save(newBooking);
 
             }

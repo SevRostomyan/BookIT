@@ -1,6 +1,7 @@
 package com.bookit.bookit.dto;
 
 import com.bookit.bookit.enums.BookingStatus;
+import com.bookit.bookit.enums.CleaningReportStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,4 +20,5 @@ public class BokningDTO {
     private String messageAtBooking;
     private String customerFeedback;
     private BookingStatus status;
+    private CleaningReportStatus cleaningReportStatus;
 }

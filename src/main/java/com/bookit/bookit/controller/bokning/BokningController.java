@@ -54,11 +54,22 @@ public class BokningController {
 
     @PostMapping("/fetchCompletedBookingsByUserId")
     public ResponseEntity<List<BokningDTO>> fetchCompletedBookingsByUserId(@RequestBody UserIdRequest request) {
-        List<BokningDTO> completedBookings = bokningService.getCompletedBookingsByUserId(request.getUserId());
+        List<BokningDTO> completedBookings = bokningService.fetchCompletedBookingsByUserId(request.getUserId());
         if (completedBookings != null && !completedBookings.isEmpty()) {
             return ResponseEntity.ok(completedBookings);
         } else {
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.noContent().build();
         }
     }
+
+    @PostMapping("/fetchReportedCompletedBookingsByUserId")
+    public ResponseEntity<List<BokningDTO>> fetchReportedCompletedBookingsByUserId(@RequestBody UserIdRequest request) {
+        List<BokningDTO> reportedCompletedBookings = bokningService.fetchCompletedCleaningsByUserId(request.getUserId());
+        if (reportedCompletedBookings != null && !reportedCompletedBookings.isEmpty()) {
+            return ResponseEntity.ok(reportedCompletedBookings);
+        } else {
+            return ResponseEntity.noContent().build();
+        }
+    }
+
 }
