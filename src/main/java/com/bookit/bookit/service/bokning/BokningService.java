@@ -237,7 +237,7 @@ public class BokningService {
         List<Bokning> bookings;
         String role = getUserRoleById(userId);
         if ("KUND".equals(role)) {
-            bookings = bokningRepository.findAllByKundIdAndCleaningReportStatus(userId, CleaningReportStatus.REPORTED_COMPLETED_AND_READY_FOR_CUSTOMER_REVIEW);
+            bookings = bokningRepository.findAllByKundIdAndCleaningReportStatus(userId, CleaningReportStatus.REPORTED_COMPLETED_AND_READY_FOR_CUSTOMER_REVIEW); //Kanske behöver ändra värdet till approved
         } else if ("STÄDARE".equals(role)) {
             bookings = bokningRepository.findAllByStädareIdAndCleaningReportStatus(userId, CleaningReportStatus.REPORTED_COMPLETED_AND_READY_FOR_CUSTOMER_REVIEW);
         } else {

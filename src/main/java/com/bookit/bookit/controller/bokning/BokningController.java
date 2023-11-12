@@ -51,7 +51,7 @@ public class BokningController {
 
 
 
-
+    //Från kundens perspektiv
     @PostMapping("/fetchCompletedBookingsByUserId")
     public ResponseEntity<List<BokningDTO>> fetchCompletedBookingsByUserId(@RequestBody UserIdRequest request) {
         List<BokningDTO> completedBookings = bokningService.fetchCompletedBookingsByUserId(request.getUserId());
@@ -62,6 +62,8 @@ public class BokningController {
         }
     }
 
+
+    //Från städarens perspektiv
     @PostMapping("/fetchReportedCompletedBookingsByUserId")
     public ResponseEntity<List<BokningDTO>> fetchReportedCompletedBookingsByUserId(@RequestBody UserIdRequest request) {
         List<BokningDTO> reportedCompletedBookings = bokningService.fetchCompletedCleaningsByUserId(request.getUserId());
