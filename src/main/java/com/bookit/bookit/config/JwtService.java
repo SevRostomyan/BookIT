@@ -1,4 +1,3 @@
-/*
 package com.bookit.bookit.config;
 
 import io.jsonwebtoken.Claims;
@@ -75,4 +74,3 @@ public boolean isTokenValid(String token, UserDetails userDetails){
         return Keys.hmacShaKeyFor(keyBytes);
     }
 }
-*/

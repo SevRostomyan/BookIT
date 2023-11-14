@@ -1,4 +1,3 @@
-/*
 package com.bookit.bookit.controller.authController;
 
 import lombok.AllArgsConstructor;
@@ -15,4 +14,3 @@ public class AuthenticationResponse {
     private String token; //Token som ska skickas tillbaka till usern
 
 }
-*/

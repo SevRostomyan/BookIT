@@ -19,16 +19,13 @@ import java.util.UUID;
 public class Admin extends UserEntity {
 
 
-
-
-
     public Admin(Integer id, String firstname, String lastname, String email, String password, UserRole role, List<Notifications> notifications) {
         super(id, firstname, lastname, email, password, role, notifications);
     }
 
-/*  @OneToOne(cascade = CascadeType.ALL)
-    private User user;
-    //Kopplat till User klassen för inloggningssyfte*/
+  @OneToOne(cascade = CascadeType.ALL)
+    private UserEntity user;
+    //Kopplat till UserEntity klassen för inloggningssyfte
 
     //Troligen behöver komplettering
 }

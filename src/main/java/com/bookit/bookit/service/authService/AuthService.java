@@ -1,11 +1,10 @@
-/*
 package com.bookit.bookit.service.authService;
 
 import com.bookit.bookit.config.JwtService;
 import com.bookit.bookit.controller.authController.AuthenticationRequest;
 import com.bookit.bookit.controller.authController.AuthenticationResponse;
 import com.bookit.bookit.controller.authController.RegisterRequest;
-import com.bookit.bookit.entity.user.User;
+import com.bookit.bookit.entity.user.UserEntity;
 import com.bookit.bookit.enums.UserRole;
 import com.bookit.bookit.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +28,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
 
     public AuthenticationResponse register(RegisterRequest request) {
-        var user = User.builder()
+        var user = UserEntity.builder()
                 .firstname(request.getFirstname())
                 .lastname(request.getLastname())
                 .email(request.getEmail())
@@ -67,4 +66,3 @@ public class AuthService {
                 .build();
     }
 }
-*/

@@ -1,4 +1,3 @@
-/*
 package com.bookit.bookit.config;
 
 import jakarta.servlet.Filter;
@@ -78,4 +77,3 @@ public class SecurityConfig {
 
 
 }
-*/

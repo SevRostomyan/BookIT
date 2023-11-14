@@ -1,4 +1,3 @@
-/*
 package com.bookit.bookit.config;
 
 import jakarta.servlet.FilterChain;
@@ -61,4 +60,3 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
     }
 }
-*/

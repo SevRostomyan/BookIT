@@ -1,4 +1,3 @@
-/*
 package com.bookit.bookit.config;
 
 import com.bookit.bookit.repository.user.UserRepository;
@@ -43,4 +42,3 @@ public class ApplicationConfig {
         return new BCryptPasswordEncoder();
     }
 }
-*/

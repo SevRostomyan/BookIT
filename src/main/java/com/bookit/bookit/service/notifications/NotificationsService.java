@@ -6,6 +6,7 @@ import com.bookit.bookit.entity.user.UserEntity;
 import com.bookit.bookit.enums.StädningsAlternativ;
 import com.bookit.bookit.repository.notifications.NotificationsRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 
 @Service
 @AllArgsConstructor
+@EnableJpaRepositories("com.bookit.bookit.repository.notifications")
 public class NotificationsService {
 
     private final JavaMailSender javaMailSender;

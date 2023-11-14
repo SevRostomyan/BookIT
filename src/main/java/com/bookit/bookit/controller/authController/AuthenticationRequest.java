@@ -1,4 +1,3 @@
-/*
 package com.bookit.bookit.controller.authController;
 
 import lombok.AllArgsConstructor;
@@ -14,4 +13,3 @@ public class AuthenticationRequest {
     private String email;
     String password;
 }
-*/

@@ -21,9 +21,17 @@ import org.springframework.context.annotation.Configuration;
 
 import java.time.LocalDateTime;
 
-//import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
-/*@EnableJpaRepositories("com.bookit.bookit.repository.user")*/
+@EnableJpaRepositories(
+        {
+                "com.bookit.bookit.repository.user",
+                "com.bookit.bookit.repository.admin",
+                "com.bookit.bookit.repository.kund",
+                "com.bookit.bookit.repository.bokning",
+                "com.bookit.bookit.repository.städare",
+                "com.bookit.bookit.repository.tjänst"})
 @Configuration
 public class UserConfig {
 
@@ -47,15 +55,15 @@ public class UserConfig {
 
 
     @Bean
-    CommandLineRunner initAdmin(UserRepository userRepository, /*PasswordEncoder passwordEncoder,*/ AdminRepository adminRepository, KundRepository kundRepository, BokningRepository bokningRepository, TjänstRepository tjänstRepository, StädareRepository städareRepository) {
+    CommandLineRunner initAdmin(UserRepository userRepository, PasswordEncoder passwordEncoder, AdminRepository adminRepository, KundRepository kundRepository, BokningRepository bokningRepository, TjänstRepository tjänstRepository, StädareRepository städareRepository) {
         return args -> {
             if (userRepository.countByRole(UserRole.ADMIN) == 0) {
                 Admin admin = new Admin();
                 admin.setFirstname("Sevak");
                 admin.setLastname("Rostomyan");
                 admin.setEmail("sev-rostomyan@hotmail.com");
-                //admin.setPassword(passwordEncoder.encode("superSecretPassword"));
-                admin.setPassword("superSecretPassword");  // TODO: Replace with own encoding logic
+                admin.setPassword(passwordEncoder.encode("superSecretPassword"));// TODO: Replace with own encoding logic
+                //admin.setPassword("superSecretPassword");
                 admin.setRole(UserRole.ADMIN);
                 adminRepository.save(admin);
             }
@@ -65,8 +73,8 @@ public class UserConfig {
                 kund.setFirstname("Erik");
                 kund.setLastname("Erikson");
                 kund.setEmail("erik-erikson@hotmail.com");
-                //kund.setPassword(passwordEncoder.encode("superSecretPassword"));
-                kund.setPassword("superSecretPassword");  // TODO: Replace with your own encoding logic
+                kund.setPassword(passwordEncoder.encode("superSecretPassword")); // TODO: Replace with your own encoding logic
+                //kund.setPassword("superSecretPassword");
                 kund.setRole(UserRole.KUND);
                 kundRepository.save(kund);
 
@@ -76,8 +84,8 @@ public class UserConfig {
                     städare.setFirstname("Anna");
                     städare.setLastname("Andersson");
                     städare.setEmail("anna-andersson@hotmail.com");
-                    //städare.setPassword(passwordEncoder.encode("superSecretPassword"));
-                    städare.setPassword("superSecretPassword");  // TODO: Replace with your own encoding logic
+                    städare.setPassword(passwordEncoder.encode("superSecretPassword"));  // TODO: Replace with your own encoding logic
+                    //städare.setPassword("superSecretPassword");
                     städare.setRole(UserRole.STÄDARE);
                     städareRepository.save(städare);
                 }
