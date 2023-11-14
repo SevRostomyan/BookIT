@@ -21,6 +21,8 @@ import com.bookit.bookit.config.JwtAuthenticationFilter;
 
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+//SecurityConfig is where you define and enforce security policies, including role-based access control.
+//This is done by configuring HTTP security to restrict access to certain URLs based on the roles of the authenticated user.
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor

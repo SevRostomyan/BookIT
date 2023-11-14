@@ -16,6 +16,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+//Purpose: The primary role of JwtService is to generate and validate JWT tokens.
+// It handles the creation of tokens, setting claims (like username, roles, etc.),
+// and validating these tokens (checking if they are expired, tampered with, etc.).
 @Service
 public class JwtService {
     private static final String SECRET_KEY = "TOTDo8keqi2YktPqhMxI5uIuYZhsWGC5v2X2haTFMd3ssEe0hijkQqERCXI2NrWDaL/VU+B6xvdX+fwkDYOwFptbGu5Lzb9LpaoyilF6heXI1jHFHQz/9cWuiCUs8SD/12t8xfXmFmmN6KZvCVgMQ427XBDFl/NsNxLmeRttMW9f+q/2Ifc6wl3XBWP55jGSwoyeUramVrro+JiT/oMUe+eYaIxItUrBgN3uK1m9CUPRUT65LL4kHZ/4ntgWAABLXkNdRqJ4/KdFsC3eliwVtpUGzp92QDXGF3BhXtPdJrFlfIrElBLU+FicS4uk+Ry0gnvvymgAHknH/CRg4T0Xc4W+AMryCZQuJevLHTUMeVc=\n";

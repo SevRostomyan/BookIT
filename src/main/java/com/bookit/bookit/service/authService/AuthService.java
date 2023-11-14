@@ -4,8 +4,12 @@ import com.bookit.bookit.config.JwtService;
 import com.bookit.bookit.controller.authController.AuthenticationRequest;
 import com.bookit.bookit.controller.authController.AuthenticationResponse;
 import com.bookit.bookit.controller.authController.RegisterRequest;
+import com.bookit.bookit.entity.admin.Admin;
+import com.bookit.bookit.entity.kund.Kund;
+import com.bookit.bookit.entity.städare.Städare;
 import com.bookit.bookit.entity.user.UserEntity;
 import com.bookit.bookit.enums.UserRole;
+import com.bookit.bookit.exception.UserAlreadyExistsException;
 import com.bookit.bookit.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,7 +31,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
-    public AuthenticationResponse register(RegisterRequest request) {
+  /*  public AuthenticationResponse register(RegisterRequest request) {
         var user = UserEntity.builder()
                 .firstname(request.getFirstname())
                 .lastname(request.getLastname())
@@ -36,6 +40,42 @@ public class AuthService {
                 .role(request.getRole())
                 .build();
         repository.save(user);
+        var jwtToken = jwtService.generateToken(user);
+        return AuthenticationResponse.builder()
+                .token(jwtToken)
+                .build();
+    }*/
+
+    public AuthenticationResponse register(RegisterRequest request) {
+        // Check if user already exists. If exists returnes 409 in the body when checking in Postman
+        if (repository.findUserByEmail(request.getEmail()).isPresent()) {
+            throw new UserAlreadyExistsException("User with email " + request.getEmail() + " already exists");
+        }
+
+        UserEntity user;
+        switch (request.getRole()) {
+            case KUND:
+                user = new Kund();
+                break;
+            case ADMIN:
+                user = new Admin();
+                break;
+            case STÄDARE:
+                user = new Städare();
+                break;
+            default:
+                user = new UserEntity();
+                break;
+        }
+
+        user.setFirstname(request.getFirstname());
+        user.setLastname(request.getLastname());
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRole(request.getRole());
+
+        repository.save(user);
+
         var jwtToken = jwtService.generateToken(user);
         return AuthenticationResponse.builder()
                 .token(jwtToken)
