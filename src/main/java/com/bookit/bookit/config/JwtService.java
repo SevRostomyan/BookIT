@@ -1,5 +1,6 @@
 package com.bookit.bookit.config;
 
+import com.bookit.bookit.entity.user.UserEntity;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -32,15 +33,22 @@ public <T> T extractClaim(String token, Function<Claims, T> claimsResolver){
         return claimsResolver.apply(claims);
 }
 
-public String generateToken(UserDetails userDetails){
+/*public String generateToken(UserDetails userDetails){
         return generateToken(new HashMap<>(), userDetails);
-}
+}*/
+
+    //Modification of the above method to extract the userId also.
+    public String generateToken(UserDetails userDetails) {
+        Map<String, Object> claims = new HashMap<>();
+        if (userDetails instanceof UserEntity) {
+            UserEntity user = (UserEntity) userDetails;
+            claims.put("userId", user.getId());
+        }
+        return generateToken(claims, userDetails);
+    }
 
 
-public String generateToken(
-        Map<String, Object> extraClaims,
-        UserDetails userDetails
-){
+public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails){
 return Jwts
         .builder()
         .setClaims(extraClaims)
@@ -50,6 +58,12 @@ return Jwts
         .signWith(getSignInKey(), SignatureAlgorithm.HS256)
         .compact();
 }
+
+    public Integer extractUserId(String token) {
+        final Claims claims = extractAllClaims(token);
+        return claims.get("userId", Integer.class);
+    }
+
 
 public boolean isTokenValid(String token, UserDetails userDetails){
         final String username = extractUsername(token);
