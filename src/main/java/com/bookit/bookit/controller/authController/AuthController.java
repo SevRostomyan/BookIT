@@ -1,6 +1,9 @@
 package com.bookit.bookit.controller.authController;
 
 
+import com.bookit.bookit.dto.AuthenticationRequest;
+import com.bookit.bookit.dto.AuthenticationResponse;
+import com.bookit.bookit.dto.RegisterRequest;
 import com.bookit.bookit.service.authService.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

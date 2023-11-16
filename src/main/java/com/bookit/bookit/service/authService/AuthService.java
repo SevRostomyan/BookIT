@@ -1,14 +1,13 @@
 package com.bookit.bookit.service.authService;
 
 import com.bookit.bookit.config.JwtService;
-import com.bookit.bookit.controller.authController.AuthenticationRequest;
-import com.bookit.bookit.controller.authController.AuthenticationResponse;
-import com.bookit.bookit.controller.authController.RegisterRequest;
+import com.bookit.bookit.dto.AuthenticationRequest;
+import com.bookit.bookit.dto.AuthenticationResponse;
+import com.bookit.bookit.dto.RegisterRequest;
 import com.bookit.bookit.entity.admin.Admin;
 import com.bookit.bookit.entity.kund.Kund;
 import com.bookit.bookit.entity.städare.Städare;
 import com.bookit.bookit.entity.user.UserEntity;
-import com.bookit.bookit.enums.UserRole;
 import com.bookit.bookit.exception.UserAlreadyExistsException;
 import com.bookit.bookit.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +18,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import javax.management.relation.Role;
 
 
 @Service

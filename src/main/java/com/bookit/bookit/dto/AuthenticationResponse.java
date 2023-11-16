@@ -1,4 +1,4 @@
-package com.bookit.bookit.controller.authController;
+package com.bookit.bookit.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

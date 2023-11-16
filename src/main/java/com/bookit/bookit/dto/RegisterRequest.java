@@ -1,4 +1,4 @@
-package com.bookit.bookit.controller.authController;
+package com.bookit.bookit.dto;
 
 import com.bookit.bookit.enums.UserRole;
 import lombok.AllArgsConstructor;
