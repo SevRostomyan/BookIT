@@ -34,6 +34,7 @@ public class Bokning {
     private Tjänst tjänst;
 
     private LocalDateTime bookingTime;
+    private LocalDateTime endTime;
 
     private String adress;
 

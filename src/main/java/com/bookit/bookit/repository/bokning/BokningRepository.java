@@ -2,6 +2,7 @@ package com.bookit.bookit.repository.bokning;
 
 import com.bookit.bookit.entity.bokning.Bokning;
 import com.bookit.bookit.entity.kund.Kund;
+import com.bookit.bookit.entity.städare.Städare;
 import com.bookit.bookit.enums.BookingStatus;
 import com.bookit.bookit.enums.CleaningReportStatus;
 
@@ -20,10 +21,10 @@ import java.util.Optional;
 public interface BokningRepository extends JpaRepository<Bokning, Integer> {
    // void save(Bokning newBooking);
 
-    boolean existsByKundAndTjänst_StädningsAlternativ(Kund kund, StädningsAlternativ städningsAlternativ);
+    boolean existsByKundAndTjänst_StädningsAlternativAndBookingTimeAndEndTime(
+            Kund kund, StädningsAlternativ städningsAlternativ, LocalDateTime bookingTime, LocalDateTime endTime);
 
-    boolean existsByKundAndTjänst_StädningsAlternativAndBookingTime(
-            Kund kund, StädningsAlternativ städningsAlternativ, LocalDateTime bookingTime);
+
 
     List<Bokning> findAllByKundId(Integer kundId);
 
@@ -48,5 +49,10 @@ public interface BokningRepository extends JpaRepository<Bokning, Integer> {
 
     Optional<Bokning> findById(Integer id);
 
-    List<Bokning> findAllByStädareIdAndBookingTimeBetween(Integer städareId, LocalDateTime start, LocalDateTime end);
+    List<Bokning> findAllByStädareIdAndBookingTimeLessThanEqualAndEndTimeGreaterThanEqual(
+            Integer städareId, LocalDateTime bookingTime, LocalDateTime endTime);
+
+
+
+
 }

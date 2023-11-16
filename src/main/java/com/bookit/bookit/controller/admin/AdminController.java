@@ -2,21 +2,24 @@ package com.bookit.bookit.controller.admin;
 
 
 import com.bookit.bookit.dto.AssignCleaningRequest;
+import com.bookit.bookit.dto.StädareDTO;
 import com.bookit.bookit.service.städare.StädareService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.bookit.bookit.service.admin.AdminService;
-import com.bookit.bookit.service.städare.StädareService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 //import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import java.time.LocalDateTime;
+
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -62,6 +65,7 @@ public class AdminController {
 
     //Som en Admin tilldela ett städningsuppdrag till en städare
     //OBS: servicemetoden finns i StädareService
+    //OBS2: Denna metod ska användas enbart av en Admin som ska hämta StädareId i frontenden och överföra till request body av denna endpoint.
     @PostMapping("/assignCleaning")
     public ResponseEntity<String> assignCleaning(@RequestBody AssignCleaningRequest request) {
         String result = städareService.assignCleaning(request.getBookingId(), request.getStädareId());
@@ -71,4 +75,13 @@ public class AdminController {
             return ResponseEntity.badRequest().body(result);
         }
     }
+
+    //Denna ska anropas i samband med ovan metod för att kunna fetcha en lista med lediga städare under bokningens period och tilldela.
+    // Se bild i kommentarerna i Jira under uppgift 61.
+    @GetMapping("/available-cleaners")
+    public ResponseEntity<List<StädareDTO>> getAvailableCleaners(@RequestParam("bookingTime") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime bookingTime) {
+        List<StädareDTO> availableCleaners = städareService.getAvailableCleanersForTime(bookingTime);
+        return ResponseEntity.ok(availableCleaners);
+    }
+
 }

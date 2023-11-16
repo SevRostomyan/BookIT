@@ -4,17 +4,21 @@ import com.bookit.bookit.entity.bokning.Bokning;
 import com.bookit.bookit.entity.städare.Städare;
 import com.bookit.bookit.enums.BookingStatus;
 import com.bookit.bookit.enums.CleaningReportStatus;
+import com.bookit.bookit.dto.StädareDTO;
 import com.bookit.bookit.enums.StädningsAlternativ;
 import com.bookit.bookit.repository.bokning.BokningRepository;
 import com.bookit.bookit.repository.städare.StädareRepository;
 import com.bookit.bookit.service.notifications.NotificationsService;
+import com.bookit.bookit.utils.BokningMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 //@RequiredArgsConstructor
@@ -23,11 +27,13 @@ public class StädareService {
     private final BokningRepository bokningRepository;
     private final StädareRepository städareRepository;
     private final NotificationsService notificationsService;
+    private final BokningMapper bokningMapper;
 
 
     //////Nedan tre metoder arbetar ihop för att tilldela städning till städare och informera städaren via mejl
-    @Transactional
+
     // StädareService.java
+    @Transactional
     public String assignCleaning(Integer bookingId, Integer städareId) {
         // Fetch the booking and cleaner details
         Bokning booking = bokningRepository.findById(bookingId).orElse(null);
@@ -37,12 +43,13 @@ public class StädareService {
             return "Invalid booking or cleaner ID.";
         }
 
-        // Define a time range to check for overlapping bookings
-        LocalDateTime start = booking.getBookingTime().minusMinutes(15);
-        LocalDateTime end = booking.getBookingTime().plusMinutes(15);
+        // Use the booking's time slot for checking overlapping bookings
+        LocalDateTime bookingTime = booking.getBookingTime();
+        LocalDateTime endTime = booking.getEndTime(); // Use the endTime from the booking
 
-        // Check if the cleaner is already booked within the time range
-        List<Bokning> existingBookings = bokningRepository.findAllByStädareIdAndBookingTimeBetween(städareId, start, end);
+        // Check if the cleaner is already booked within the time slot
+        List<Bokning> existingBookings = bokningRepository.findAllByStädareIdAndBookingTimeLessThanEqualAndEndTimeGreaterThanEqual(
+                städareId, bookingTime, endTime);
         if (!existingBookings.isEmpty()) {
             return "Cleaner is already booked within this time range.";
         }
@@ -58,10 +65,25 @@ public class StädareService {
 
         bokningRepository.save(booking);
 
-        // Prepare the details for the email to be sent after the transaction
+        // Prepare and send the assignment email
         prepareAndSendAssignmentEmail(städare, booking);
 
         return "Success";
+    }
+
+
+    //Dena ska användas med ovan metod för att fetcha en lista av tillgängliga städare för att kunna assigna till bokningar.
+    public List<StädareDTO> getAvailableCleanersForTime(LocalDateTime bookingTime) {
+        LocalDateTime startTime = bookingTime.truncatedTo(ChronoUnit.HOURS);
+        if (startTime.getHour() % 2 != 0) {
+            startTime = startTime.plusHours(1); // Adjust to the next even hour
+        }
+        LocalDateTime endTime = startTime.plusHours(2); // 2-hour slot
+
+        List<Städare> availableCleaners = städareRepository.findAvailableCleaners(startTime, endTime);
+        return availableCleaners.stream()
+                .map(bokningMapper::mapToStädareDTO) // Convert entities to DTOs
+                .collect(Collectors.toList());
     }
 
     // This method should be outside the transactional context
@@ -69,14 +91,20 @@ public class StädareService {
         // Fetch the service type from the booking
         StädningsAlternativ serviceType = booking.getTjänst().getStädningsAlternativ();
 
+        // Calculate the end time based on the 2-hour slot
+        LocalDateTime startTime = booking.getBookingTime();
+        LocalDateTime endTime = startTime.plusHours(2); // Assuming a 2-hour slot
+
         // Prepare email details
         String email = städare.getEmail();
         String subject = "New Cleaning Task Assigned";
-        String body = "You have been assigned a new cleaning task for " + booking.getBookingTime().toString();
+        String body = "You have been assigned a new cleaning task. Time slot: "
+                + startTime.toString() + " to " + endTime.toString();
 
         // Send the email
         sendAssignmentEmail(email, subject, body, serviceType, städare, booking);
     }
+
 
     // This method actually sends the email and should handle any exceptions internally
     private void sendAssignmentEmail(String email, String subject, String body, StädningsAlternativ serviceType, Städare städare, Bokning booking) {
@@ -88,6 +116,10 @@ public class StädareService {
             // You could also implement a retry mechanism or queue the email for later retry
         }
     }
+
+
+
+
 
 
 

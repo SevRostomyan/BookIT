@@ -28,16 +28,21 @@ public class JwtService {
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
-public <T> T extractClaim(String token, Function<Claims, T> claimsResolver){
+
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
-}
+    }
 
-/*public String generateToken(UserDetails userDetails){
-        return generateToken(new HashMap<>(), userDetails);
-}*/
+    public Integer extractUserId(String token) {
+        final Claims claims = extractAllClaims(token);
+        return claims.get("userId", Integer.class);
+    }
 
-    //Modification of the above method to extract the userId also.
+
+    //generateToken(UserDetails userDetails): This method is a higher-level method that prepares the claims for the JWT token.
+    // It checks if the UserDetails instance is of type UserEntity and, if so, adds the user ID to the claims.
+    // This method then calls the second method to actually generate the token.
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         if (userDetails instanceof UserEntity) {
@@ -47,28 +52,24 @@ public <T> T extractClaim(String token, Function<Claims, T> claimsResolver){
         return generateToken(claims, userDetails);
     }
 
-
-public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails){
-return Jwts
-        .builder()
-        .setClaims(extraClaims)
-        .setSubject(userDetails.getUsername())
-        .setIssuedAt(new Date(System.currentTimeMillis()))
-        .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 20)) //Token går ut om 20 min för säkerhetsskäll.
-        .signWith(getSignInKey(), SignatureAlgorithm.HS256)
-        .compact();
-}
-
-    public Integer extractUserId(String token) {
-        final Claims claims = extractAllClaims(token);
-        return claims.get("userId", Integer.class);
+    //generateToken(Map<String, Object> extraClaims, UserDetails userDetails): This is the lower-level method that actually generates the JWT token.
+    // It takes the claims (which may include the user ID from the first method) and the user's username, and then builds the JWT token.
+    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+        return Jwts
+                .builder()
+                .setClaims(extraClaims)
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 20)) //Token går ut om 20 min för säkerhetsskäll.
+                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+                .compact();
     }
 
 
-public boolean isTokenValid(String token, UserDetails userDetails){
+    public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
-}
+    }
 
     private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
@@ -78,7 +79,7 @@ public boolean isTokenValid(String token, UserDetails userDetails){
         return extractClaim(token, Claims::getExpiration);
     }
 
-    private Claims extractAllClaims(String token){
+    private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSignInKey())
                 .build()
