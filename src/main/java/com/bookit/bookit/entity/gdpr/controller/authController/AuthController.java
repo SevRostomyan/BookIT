@@ -1,4 +1,4 @@
-package com.bookit.bookit.controller.authController;
+package com.bookit.bookit.entity.gdpr.controller.authController;
 
 
 import com.bookit.bookit.dto.AuthenticationRequest;

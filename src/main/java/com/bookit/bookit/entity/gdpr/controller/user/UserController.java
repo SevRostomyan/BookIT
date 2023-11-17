@@ -1,4 +1,4 @@
-package com.bookit.bookit.controller.user;
+package com.bookit.bookit.entity.gdpr.controller.user;
 
 import org.springframework.web.bind.annotation.*;
 

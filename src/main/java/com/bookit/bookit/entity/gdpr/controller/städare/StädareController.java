@@ -1,4 +1,4 @@
-package com.bookit.bookit.controller.städare;
+package com.bookit.bookit.entity.gdpr.controller.städare;
 
 import com.bookit.bookit.dto.CleaningStatusRequest;
 import com.bookit.bookit.enums.CleaningReportStatus;

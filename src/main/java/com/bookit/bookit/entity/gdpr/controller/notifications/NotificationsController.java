@@ -1,9 +1,11 @@
-package com.bookit.bookit.controller.betalning;
+package com.bookit.bookit.entity.gdpr.controller.notifications;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/betalning")
-public class BetalningController {
+@RequestMapping("/api/notifications")
+public class NotificationsController {
+
+
 }
