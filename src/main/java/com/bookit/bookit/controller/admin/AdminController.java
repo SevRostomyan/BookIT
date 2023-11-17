@@ -1,4 +1,4 @@
-package com.bookit.bookit.entity.gdpr.controller.admin;
+package com.bookit.bookit.controller.admin;
 
 
 import com.bookit.bookit.dto.AssignCleaningRequest;

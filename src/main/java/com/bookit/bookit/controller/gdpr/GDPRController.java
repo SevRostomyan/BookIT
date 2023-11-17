@@ -1,9 +1,9 @@
-package com.bookit.bookit.entity.gdpr.controller.tjänst;
+package com.bookit.bookit.controller.gdpr;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/tjänst")
-public class TjänstController {
+@RequestMapping("/api/GDPR")
+public class GDPRController {
 }

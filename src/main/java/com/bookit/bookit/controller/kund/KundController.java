@@ -1,4 +1,4 @@
-package com.bookit.bookit.entity.gdpr.controller.kund;
+package com.bookit.bookit.controller.kund;
 
 import com.bookit.bookit.dto.CleaningStatusRequest;
 import com.bookit.bookit.dto.FeedbackRequest;

@@ -1,4 +1,4 @@
-package com.bookit.bookit.entity.gdpr.controller.bokning;
+package com.bookit.bookit.controller.bokning;
 
 import com.bookit.bookit.config.JwtService;
 import com.bookit.bookit.dto.BokningDTO;
