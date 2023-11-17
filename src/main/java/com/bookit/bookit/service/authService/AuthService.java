@@ -10,6 +10,7 @@ import com.bookit.bookit.entity.städare.Städare;
 import com.bookit.bookit.entity.user.UserEntity;
 import com.bookit.bookit.exception.UserAlreadyExistsException;
 import com.bookit.bookit.repository.user.UserRepository;
+import com.bookit.bookit.service.notifications.NotificationsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -26,22 +27,11 @@ public class AuthService {
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final NotificationsService notificationsService;
+
     private final AuthenticationManager authenticationManager;
 
-  /*  public AuthenticationResponse register(RegisterRequest request) {
-        var user = UserEntity.builder()
-                .firstname(request.getFirstname())
-                .lastname(request.getLastname())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .role(request.getRole())
-                .build();
-        repository.save(user);
-        var jwtToken = jwtService.generateToken(user);
-        return AuthenticationResponse.builder()
-                .token(jwtToken)
-                .build();
-    }*/
+
 
     public AuthenticationResponse register(RegisterRequest request) {
         // Check if user already exists. If exists returnes 409 in the body when checking in Postman
@@ -73,11 +63,28 @@ public class AuthService {
 
         repository.save(user);
 
+        // Prepare and send registration email
+        prepareAndSendRegistrationEmail(user);
+
         var jwtToken = jwtService.generateToken(user);
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .build();
     }
+
+    // This method should be outside the transactional context
+    private void prepareAndSendRegistrationEmail(UserEntity user) {
+        String email = user.getEmail();
+        String subject = "Welcome to Our Service";
+        String body = "Dear " + user.getFirstname() + ",\n\nWelcome to our service. Your account has been successfully created.";
+
+        // Send the email
+        notificationsService.sendRegistrationEmail(email, subject, body, user);
+    }
+
+    // This method actually sends the email and should handle any exceptions internally
+
+
 
 
 

@@ -29,6 +29,20 @@ public class StädareService {
     private final NotificationsService notificationsService;
     private final BokningMapper bokningMapper;
 
+    //Dena ska användas med nedan metod för att fetcha en lista av tillgängliga städare för att kunna assigna till bokningar.
+    public List<StädareDTO> getAvailableCleanersForTime(LocalDateTime bookingTime) {
+        LocalDateTime startTime = bookingTime.truncatedTo(ChronoUnit.HOURS);
+        if (startTime.getHour() % 2 != 0) {
+            startTime = startTime.plusHours(1); // Adjust to the next even hour
+        }
+        LocalDateTime endTime = startTime.plusHours(2); // 2-hour slot
+
+        List<Städare> availableCleaners = städareRepository.findAvailableCleaners(startTime, endTime);
+        return availableCleaners.stream()
+                .map(bokningMapper::mapToStädareDTO) // Convert entities to DTOs
+                .collect(Collectors.toList());
+    }
+
 
     //////Nedan tre metoder arbetar ihop för att tilldela städning till städare och informera städaren via mejl
 
@@ -71,20 +85,6 @@ public class StädareService {
         return "Success";
     }
 
-
-    //Dena ska användas med ovan metod för att fetcha en lista av tillgängliga städare för att kunna assigna till bokningar.
-    public List<StädareDTO> getAvailableCleanersForTime(LocalDateTime bookingTime) {
-        LocalDateTime startTime = bookingTime.truncatedTo(ChronoUnit.HOURS);
-        if (startTime.getHour() % 2 != 0) {
-            startTime = startTime.plusHours(1); // Adjust to the next even hour
-        }
-        LocalDateTime endTime = startTime.plusHours(2); // 2-hour slot
-
-        List<Städare> availableCleaners = städareRepository.findAvailableCleaners(startTime, endTime);
-        return availableCleaners.stream()
-                .map(bokningMapper::mapToStädareDTO) // Convert entities to DTOs
-                .collect(Collectors.toList());
-    }
 
     // This method should be outside the transactional context
     private void prepareAndSendAssignmentEmail(Städare städare, Bokning booking) {

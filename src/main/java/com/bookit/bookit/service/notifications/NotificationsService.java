@@ -59,5 +59,40 @@ public class NotificationsService {
         }
     }
 
+
+    public void sendRegistrationEmail(String to, String subject, String body, UserEntity user) {
+        // Create the notification entity
+        Notifications notification = new Notifications();
+        notification.setMeddelande(body);
+        notification.setSubject(subject);
+        notification.setUser(user);
+        notification.setTimestamp(LocalDateTime.now());
+        notification.setIsSent(false);
+        notification.setIsRead(false);
+        notification.setBokning(null); // Explicitly set to null for registration emails
+
+        // Save the notification entity to the database
+        notificationsRepository.save(notification);
+
+        // Create the email message
+        SimpleMailMessage msg = new SimpleMailMessage();
+        msg.setTo(to);
+        msg.setSubject(subject);
+        msg.setText(body);
+
+        try {
+            // Attempt to send the email
+            javaMailSender.send(msg);
+            // Update the notification as sent
+            notification.setIsSent(true);
+            notificationsRepository.save(notification);
+        } catch (MailException e) {
+            // Log the exception for failed email sending
+            System.err.println("Error sending registration email: " + e.getMessage());
+            // Additional error handling can be implemented here
+        }
+    }
+
+
     // Additional methods to mark a notification as read, delete, etc. can be added here
 }
