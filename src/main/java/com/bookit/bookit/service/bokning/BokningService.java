@@ -14,6 +14,7 @@ import com.bookit.bookit.repository.user.UserRepository;
 import com.bookit.bookit.service.notifications.NotificationsService;
 import com.bookit.bookit.utils.BokningMapper;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,12 +79,27 @@ public class BokningService {
 
     //////Nedan två metoder arbetar ihop för att KUNDEN ska kunna markera städningen som godkänd eller underkänd och
     ///// det ska skickas mejl om arbetsstatus till både admin och städaren
-    @Transactional
+    /*@Transactional
     public void updateBookingStatus(Integer bookingId, BookingStatus newStatus) {
+        Bokning booking = bokningRepository.findById(bookingId)
+                .orElseThrow(() -> new EntityNotFoundException("Bokning inte funnen med id: " + bookingId));*/
+
+    @Transactional
+    public void updateBookingStatus(Integer bookingId, BookingStatus newStatus, Integer userId) {
         Bokning booking = bokningRepository.findById(bookingId)
                 .orElseThrow(() -> new EntityNotFoundException("Bokning inte funnen med id: " + bookingId));
 
-        // Uppdatera bokningens status
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+
+        // Check if the user is ADMIN or the KUND of the booking
+        if (!user.getRole().equals(UserRole.ADMIN)) {
+            if (!user.getRole().equals(UserRole.KUND) || !booking.getKund().getId().equals(userId)) {
+                throw new SecurityException("Unauthorized access to booking status update.");
+            }
+        }
+
+        // Update booking status
         booking.setBookingStatus(newStatus);
 
         // Bestäm motsvarande CleaningReportStatus
@@ -107,25 +123,30 @@ public class BokningService {
         sendStatusUpdateEmails(booking, newStatus, cleaningReportStatus);
     }
 
-    // Denna metod bör vara utanför den transaktionella kontexten
-    private void sendStatusUpdateEmails(Bokning booking, BookingStatus bookingStatus, CleaningReportStatus cleaningReportStatus) {
-        // Hämta admin-detaljer (antag att det bara finns en admin eller att du hämtar en specifik)
-        UserEntity admin = adminRepository.findAdminByEmail("sevrostomyan@gmail.com")
-                .orElseThrow(() -> new RuntimeException("Admin hittades inte"));
 
-        // Förbered detaljerna för e-postmeddelandet
+
+    // Denna metod bör vara utanför den transaktionella kontexten
+    //Den används till updateBookingStatus metoden ovan
+    private void sendStatusUpdateEmails(Bokning booking, BookingStatus bookingStatus, CleaningReportStatus cleaningReportStatus) {
+        // Fetch all admins
+        List<UserEntity> admins = adminRepository.findAllByRole(UserRole.ADMIN);
+
+        // Prepare email details
         String cleanerEmail = booking.getStädare().getEmail();
-        String adminEmail = admin.getEmail(); // Hämta adminens e-post från Admin-entiteten
         String subject = "Statusuppdatering för städning ID: " + booking.getId();
         String body = "Städningen har markerats som " + bookingStatus + ". Granskningsstatusen är " + cleaningReportStatus + ".";
-        StädningsAlternativ serviceType = booking.getTjänst().getStädningsAlternativ(); // Antag att du har en 'getTjänst()' metod i 'Bokning'
+        StädningsAlternativ serviceType = booking.getTjänst().getStädningsAlternativ();
 
-        // Skicka e-postmeddelandet till städaren
+        // Send email to cleaner
         notificationsService.sendEmail(cleanerEmail, subject, body, serviceType, booking.getStädare(), booking);
 
-        // Skicka e-postmeddelandet till admin
-        notificationsService.sendEmail(adminEmail, subject, body, serviceType, admin, booking);
+        // Send email to all admins
+        for (UserEntity admin : admins) {
+            String adminEmail = admin.getEmail();
+            notificationsService.sendEmail(adminEmail, subject, body, serviceType, admin, booking);
+        }
     }
+
 
 // Notera: User-parametern i sendEmail-metoden är nu en gemensam typ för både Admin och Städare.
 

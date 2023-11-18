@@ -5,6 +5,7 @@ import com.bookit.bookit.entity.kund.Kund;
 import com.bookit.bookit.entity.tjänst.Tjänst;
 import com.bookit.bookit.entity.user.UserEntity;
 import com.bookit.bookit.enums.BookingStatus;
+import com.bookit.bookit.enums.CleaningReportStatus;
 import com.bookit.bookit.repository.bokning.BokningRepository;
 import com.bookit.bookit.repository.kund.KundRepository;
 import com.bookit.bookit.repository.tjänst.TjänstRepository;
@@ -62,6 +63,7 @@ public class KundService {
         newBooking.setAdress(request.getAdress());
         newBooking.setMessageAtBooking(request.getMessageAtBooking());
         newBooking.setBookingStatus(BookingStatus.PENDING);
+        newBooking.setCleaningReportStatus(CleaningReportStatus.NOT_ASSIGNED);
 
         bokningRepository.save(newBooking);
 

@@ -29,7 +29,7 @@ public class BokningController {
         this.jwtService = jwtService;
     }
 
-    //OBS: Servicemetoden för denna finns i KundService classen då det avser kundens bokning
+    //OBS: Servicemetoden för denna finns i KundService klassen då det avser kundens bokning.
     @PostMapping("/bookCleaning")
     public ResponseEntity<String> bookCleaning(@RequestBody CleaningBookingRequest request, HttpServletRequest httpRequest) {
         String token = httpRequest.getHeader("Authorization").substring(7); // Assuming Bearer token
@@ -39,22 +39,30 @@ public class BokningController {
 
 
     //Kunden eller städaren eller admin åt kund och städare kan använda nedan metod för att hämta bokningar kopplade till en specifik id
+    //Endpointen tar in info via body och token via header
     @PostMapping("/fetchBookingsByUserId")
-    public ResponseEntity<?> fetchBookingsByUserId(@RequestBody UserIdRequest request) {
+    public ResponseEntity<?> fetchBookingsByUserId(HttpServletRequest httpRequest) {
         try {
-            List<BokningDTO> bookings = bokningService.getBookingsByUserId(request.getUserId());
+            String token = httpRequest.getHeader("Authorization").substring(7); // Using Bearer token
+            Integer userId = jwtService.extractUserId(token);
+
+            List<BokningDTO> bookings = bokningService.getBookingsByUserId(userId);
             return ResponseEntity.ok(bookings);
         } catch (EntityNotFoundException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
-
     @PostMapping("/cancelBooking")
-    public ResponseEntity<String> cancelBooking(@RequestBody BookingIdRequest request) {
-        bokningService.updateBookingStatus(request.getBookingId(), BookingStatus.CANCELLED);
+    public ResponseEntity<String> cancelBooking(@RequestBody BookingIdRequest request, HttpServletRequest httpRequest) {
+        String token = httpRequest.getHeader("Authorization").substring(7); // Extract the token
+        Integer userId = jwtService.extractUserId(token); // Extract userId from the token
+
+        bokningService.updateBookingStatus(request.getBookingId(), BookingStatus.CANCELLED, userId);
         return ResponseEntity.ok("Booking cancelled successfully.");
     }
+
+
 
 
 

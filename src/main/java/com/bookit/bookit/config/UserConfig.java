@@ -6,6 +6,7 @@ import com.bookit.bookit.entity.kund.Kund;
 import com.bookit.bookit.entity.städare.Städare;
 import com.bookit.bookit.entity.tjänst.Tjänst;
 import com.bookit.bookit.enums.BookingStatus;
+import com.bookit.bookit.enums.CleaningReportStatus;
 import com.bookit.bookit.enums.StädningsAlternativ;
 import com.bookit.bookit.enums.UserRole;
 import com.bookit.bookit.repository.admin.AdminRepository;
@@ -62,8 +63,7 @@ public class UserConfig {
                 admin.setFirstname("Sevak");
                 admin.setLastname("Rostomyan");
                 admin.setEmail("sev-rostomyan@hotmail.com");
-                admin.setPassword(passwordEncoder.encode("superSecretPassword"));// TODO: Replace with own encoding logic
-                //admin.setPassword("superSecretPassword");
+                admin.setPassword(passwordEncoder.encode("superSecretPassword"));
                 admin.setRole(UserRole.ADMIN);
                 adminRepository.save(admin);
             }
@@ -73,8 +73,7 @@ public class UserConfig {
                 kund.setFirstname("Erik");
                 kund.setLastname("Erikson");
                 kund.setEmail("erik-erikson@hotmail.com");
-                kund.setPassword(passwordEncoder.encode("superSecretPassword")); // TODO: Replace with your own encoding logic
-                //kund.setPassword("superSecretPassword");
+                kund.setPassword(passwordEncoder.encode("superSecretPassword"));
                 kund.setRole(UserRole.KUND);
                 kundRepository.save(kund);
 
@@ -84,8 +83,7 @@ public class UserConfig {
                     städare.setFirstname("Anna");
                     städare.setLastname("Andersson");
                     städare.setEmail("anna-andersson@hotmail.com");
-                    städare.setPassword(passwordEncoder.encode("superSecretPassword"));  // TODO: Replace with your own encoding logic
-                    //städare.setPassword("superSecretPassword");
+                    städare.setPassword(passwordEncoder.encode("superSecretPassword"));
                     städare.setRole(UserRole.STÄDARE);
                     städareRepository.save(städare);
                 }
@@ -101,6 +99,7 @@ public class UserConfig {
                 newBooking.setBookingTime(LocalDateTime.now());  // Hardcoded to current time
                 newBooking.setMessageAtBooking("Your message here");
                 newBooking.setBookingStatus(BookingStatus.PENDING);  // Hardcoded status
+                newBooking.setCleaningReportStatus(CleaningReportStatus.NOT_ASSIGNED);
                 bokningRepository.save(newBooking);
 
             }
