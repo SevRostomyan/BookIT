@@ -2,12 +2,15 @@ package com.bookit.bookit.service.städare;
 
 import com.bookit.bookit.entity.bokning.Bokning;
 import com.bookit.bookit.entity.städare.Städare;
+import com.bookit.bookit.entity.user.UserEntity;
 import com.bookit.bookit.enums.BookingStatus;
 import com.bookit.bookit.enums.CleaningReportStatus;
 import com.bookit.bookit.dto.StädareDTO;
 import com.bookit.bookit.enums.StädningsAlternativ;
+import com.bookit.bookit.enums.UserRole;
 import com.bookit.bookit.repository.bokning.BokningRepository;
 import com.bookit.bookit.repository.städare.StädareRepository;
+import com.bookit.bookit.repository.user.UserRepository;
 import com.bookit.bookit.service.notifications.NotificationsService;
 import com.bookit.bookit.utils.BokningMapper;
 import jakarta.persistence.EntityNotFoundException;
@@ -28,9 +31,18 @@ public class StädareService {
     private final StädareRepository städareRepository;
     private final NotificationsService notificationsService;
     private final BokningMapper bokningMapper;
+    private final UserRepository userRepository;
 
     //Dena ska användas med nedan metod för att fetcha en lista av tillgängliga städare för att kunna assigna till bokningar.
-    public List<StädareDTO> getAvailableCleanersForTime(LocalDateTime bookingTime) {
+    public List<StädareDTO> getAvailableCleanersForTime(LocalDateTime bookingTime, Integer userId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+
+        // Check if the user has the required role to access this information
+        if (!user.getRole().equals(UserRole.ADMIN)) {
+            throw new SecurityException("Unauthorized access to available cleaners.");
+        }
+
         LocalDateTime startTime = bookingTime.truncatedTo(ChronoUnit.HOURS);
         if (startTime.getHour() % 2 != 0) {
             startTime = startTime.plusHours(1); // Adjust to the next even hour
@@ -44,17 +56,26 @@ public class StädareService {
     }
 
 
+
+
     //////Nedan tre metoder arbetar ihop för att tilldela städning till städare och informera städaren via mejl
 
     // StädareService.java
     @Transactional
-    public String assignCleaning(Integer bookingId, Integer städareId) {
-        // Fetch the booking and cleaner details
+    public String assignCleaning(Integer bookingId, Integer städareId, Integer userId) {
+        // Fetch the booking, cleaner, and user details
         Bokning booking = bokningRepository.findById(bookingId).orElse(null);
         Städare städare = städareRepository.findById(städareId).orElse(null);
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
 
         if (booking == null || städare == null) {
             return "Invalid booking or cleaner ID.";
+        }
+
+        // Check if the user is ADMIN
+        if (!user.getRole().equals(UserRole.ADMIN)) {
+            return "Unauthorized access to assign cleaning.";
         }
 
         // Use the booking's time slot for checking overlapping bookings

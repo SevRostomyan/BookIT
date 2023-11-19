@@ -54,5 +54,4 @@ public interface BokningRepository extends JpaRepository<Bokning, Integer> {
 
 
 
-
 }

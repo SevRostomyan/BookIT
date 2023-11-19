@@ -6,6 +6,7 @@ import com.bookit.bookit.dto.StädareDTO;
 import com.bookit.bookit.entity.bokning.Bokning;
 import com.bookit.bookit.entity.kund.Kund;
 import com.bookit.bookit.entity.städare.Städare;
+import com.bookit.bookit.entity.user.UserEntity;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -47,4 +48,15 @@ public class BokningMapper {
         dto.setEmail(städare.getEmail());
         return dto;
     }
+
+
+    public KundDTO mapUserEntityToKundDTO(UserEntity user) {
+        KundDTO dto = new KundDTO();
+        dto.setId(user.getId());
+        dto.setFirstname(user.getFirstname()); // Adjust these according to the actual structure of UserEntity
+        dto.setLastname(user.getLastname());
+        dto.setEmail(user.getEmail());
+        return dto;
+    }
+
 }

@@ -119,8 +119,13 @@ public class BokningService {
         // Spara den uppdaterade bokningen
         bokningRepository.save(booking);
 
-        // Skicka e-postmeddelanden om statusuppdatering
-        sendStatusUpdateEmails(booking, newStatus, cleaningReportStatus);
+        // Send status update emails only if a cleaner is assigned
+        if (booking.getStädare() != null) {
+            sendStatusUpdateEmails(booking, newStatus, cleaningReportStatus);
+        } else {
+            // Handle the case where no cleaner is assigned, if necessary
+            // For example, log this situation or send a different notification
+        }
     }
 
 
@@ -132,13 +137,16 @@ public class BokningService {
         List<UserEntity> admins = adminRepository.findAllByRole(UserRole.ADMIN);
 
         // Prepare email details
-        String cleanerEmail = booking.getStädare().getEmail();
         String subject = "Statusuppdatering för städning ID: " + booking.getId();
         String body = "Städningen har markerats som " + bookingStatus + ". Granskningsstatusen är " + cleaningReportStatus + ".";
         StädningsAlternativ serviceType = booking.getTjänst().getStädningsAlternativ();
 
-        // Send email to cleaner
-        notificationsService.sendEmail(cleanerEmail, subject, body, serviceType, booking.getStädare(), booking);
+        // Check if a cleaner is assigned
+        if (booking.getStädare() != null) {
+            String cleanerEmail = booking.getStädare().getEmail();
+            // Send email to cleaner
+            notificationsService.sendEmail(cleanerEmail, subject, body, serviceType, booking.getStädare(), booking);
+        }
 
         // Send email to all admins
         for (UserEntity admin : admins) {
@@ -146,6 +154,7 @@ public class BokningService {
             notificationsService.sendEmail(adminEmail, subject, body, serviceType, admin, booking);
         }
     }
+
 
 
 // Notera: User-parametern i sendEmail-metoden är nu en gemensam typ för både Admin och Städare.
@@ -158,9 +167,19 @@ public class BokningService {
 
     //////Nedan två metoder arbetar ihop för att städaren ska kunna informera kunden om att städningen är påbörjat
     @Transactional
-    public void startCleaning(Integer bookingId) {
+    public void startCleaning(Integer bookingId, Integer userId) {
         Bokning booking = bokningRepository.findById(bookingId)
                 .orElseThrow(() -> new EntityNotFoundException("Booking not found with id: " + bookingId));
+
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+
+        // Check if the user is ADMIN or the assigned städare of the booking
+        if (!user.getRole().equals(UserRole.ADMIN)) {
+            if (!user.getRole().equals(UserRole.STÄDARE) || !booking.getStädare().getId().equals(userId)) {
+                throw new SecurityException("Unauthorized access to start cleaning.");
+            }
+        }
 
         // Update the cleaning report status to IN_PROGRESS
         booking.setCleaningReportStatus(CleaningReportStatus.IN_PROGRESS);
@@ -194,9 +213,19 @@ public class BokningService {
 
     //////Nedan två metoder arbetar ihop för att städare ska kunna informera kunden om att städningen är klar och kan granskas
     @Transactional
-    public void reportCleaningAsCompleted(Integer bookingId) {
+    public void reportCleaningAsCompleted(Integer bookingId, Integer userId) {
         Bokning booking = bokningRepository.findById(bookingId)
                 .orElseThrow(() -> new EntityNotFoundException("Booking not found with id: " + bookingId));
+
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+
+        // Check if the user is ADMIN or the assigned städare of the booking
+        if (!user.getRole().equals(UserRole.ADMIN)) {
+            if (!user.getRole().equals(UserRole.STÄDARE) || !booking.getStädare().getId().equals(userId)) {
+                throw new SecurityException("Unauthorized access to report cleaning as completed.");
+            }
+        }
 
         // Cleaner reports the cleaning as completed and ready for customer review
         booking.setCleaningReportStatus(CleaningReportStatus.REPORTED_COMPLETED_AND_READY_FOR_CUSTOMER_REVIEW);
@@ -205,6 +234,7 @@ public class BokningService {
         // After saving, send an email to the customer for review
         sendReviewEmail(booking);
     }
+
 
     // This method should be outside the transactional context
     private void sendReviewEmail(Bokning booking) {
@@ -228,22 +258,37 @@ public class BokningService {
 
 
     @Transactional
-    public void saveCustomerFeedback(Integer bookingId, String feedback) {
-        Bokning bokning = bokningRepository.findById(bookingId).orElseThrow(()->new EntityNotFoundException ("Bokning not found"));
+    public void saveCustomerFeedback(Integer bookingId, String feedback, Integer userId) {
+        Bokning bokning = bokningRepository.findById(bookingId)
+                .orElseThrow(() -> new EntityNotFoundException("Bokning not found"));
+
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+
+        // Check if the user is the KUND of the booking
+        if (!user.getRole().equals(UserRole.KUND) || !bokning.getKund().getId().equals(userId)) {
+            throw new SecurityException("Unauthorized access to provide feedback.");
+        }
+
         bokning.setCustomerFeedback(feedback);
         bokningRepository.save(bokning);
     }
 
-    //Returnerar en lista med bokningar som kunden har markerat som avklarade
-    public List<BokningDTO>fetchCompletedBookingsByUserId(Integer userId) {
+
+
+    //Returnerar en lista med bokningar som kunden har markerat som avklarade. Kan anropas av bara KUND eller STÄDARE.
+    // Admin har en separat method för det i Admin controller och service
+    public List<BokningDTO> fetchCompletedBookingsByUserId(Integer userId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+
         List<Bokning> bookings;
-        String role = getUserRoleById(userId);
-        if ("KUND".equals(role)) {
+        if (user.getRole().equals(UserRole.KUND)) {
             bookings = bokningRepository.findAllByKundIdAndBookingStatus(userId, BookingStatus.COMPLETED);
-        } else if ("STÄDARE".equals(role)) {
+        } else if (user.getRole().equals(UserRole.STÄDARE)) {
             bookings = bokningRepository.findAllByStädareIdAndBookingStatus(userId, BookingStatus.COMPLETED);
         } else {
-            return Collections.emptyList();
+            throw new SecurityException("Unauthorized access to fetch completed bookings.");
         }
 
         // Convert to DTOs
@@ -253,7 +298,11 @@ public class BokningService {
     }
 
 
-    //Returnerar en lista med bokningar som städaren har markerat som avklarade
+
+
+
+    //Returnerar en lista med bokningar som städaren har markerat som avklarade. Kan anropas av bara KUND eller STÄDARE.
+    //Admin har en separat method för det i Admin controller och service
     public List<BokningDTO> fetchCompletedCleaningsByUserId(Integer userId) {
         List<Bokning> bookings;
         String role = getUserRoleById(userId);
