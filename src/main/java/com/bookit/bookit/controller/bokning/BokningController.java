@@ -48,7 +48,8 @@ public class BokningController {
 
 
 
-    //Kunden eller städaren eller admin åt kund och städare kan använda nedan metod för att hämta bokningar kopplade till en specifik id
+    //Kunden eller städaren kan använda nedan metod för att hämta aktuella bokningar kopplade till deras id.
+    // Admin har en annan method för att hämta bådas data
     //Endpointen tar in info via body och token via header
     @PostMapping("/fetchBookingsByUserId")
     public ResponseEntity<?> fetchBookingsByUserId(HttpServletRequest httpRequest) {
@@ -85,7 +86,46 @@ public class BokningController {
     }
 
 
+    //Kan användas av både städare och kund
+    @PostMapping("/fetchNotStartedBookingsByUserId")
+    public ResponseEntity<?> fetchNotStartedBookingsByUserId(HttpServletRequest httpRequest) {
+        try {
+            String token = httpRequest.getHeader("Authorization").substring(7); // Extract the token after "Bearer "
+            Integer userId = jwtService.extractUserId(token); // Extract userId from the token
 
+            List<BokningDTO> notStartedBookings = bokningService.fetchNotStartedBookingsByUserId(userId);
+            if (notStartedBookings != null && !notStartedBookings.isEmpty()) {
+                return ResponseEntity.ok(notStartedBookings);
+            } else {
+                return ResponseEntity.noContent().build();
+            }
+        } catch (SecurityException e) {
+            logger.warn("Unauthorized attempt to fetch not started bookings: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/fetchInProgressBookingsByUserId")
+    public ResponseEntity<?> fetchInProgressBookingsByUserId(HttpServletRequest httpRequest) {
+        try {
+            String token = httpRequest.getHeader("Authorization").substring(7); // Extract the token after "Bearer "
+            Integer userId = jwtService.extractUserId(token); // Extract userId from the token
+
+            List<BokningDTO> inProgressBookings = bokningService.fetchInProgressBookingsByUserId(userId);
+            if (inProgressBookings != null && !inProgressBookings.isEmpty()) {
+                return ResponseEntity.ok(inProgressBookings);
+            } else {
+                return ResponseEntity.noContent().build();
+            }
+        } catch (SecurityException e) {
+            logger.warn("Unauthorized attempt to fetch in-progress bookings: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 
 
     //Från kundens perspektiv (alltså det är bara kunden som använder BookingStatus enumet borträknad admin)
@@ -113,16 +153,26 @@ public class BokningController {
 
 
 
-
     //Från städarens perspektiv (alltså det är bara städaren som använder CleaningReportStatus enumet borträknad admin)
     @PostMapping("/fetchReportedCompletedBookingsByUserId")
-    public ResponseEntity<List<BokningDTO>> fetchReportedCompletedBookingsByUserId(@RequestBody UserIdRequest request) {
-        List<BokningDTO> reportedCompletedBookings = bokningService.fetchCompletedCleaningsByUserId(request.getUserId());
-        if (reportedCompletedBookings != null && !reportedCompletedBookings.isEmpty()) {
-            return ResponseEntity.ok(reportedCompletedBookings);
-        } else {
-            return ResponseEntity.noContent().build();
+    public ResponseEntity<?> fetchReportedCompletedBookingsByUserId(HttpServletRequest httpRequest) {
+        try {
+            String token = httpRequest.getHeader("Authorization").substring(7); // Extract the token after "Bearer "
+            Integer userId = jwtService.extractUserId(token); // Extract userId from the token
+
+            List<BokningDTO> reportedCompletedBookings = bokningService.fetchCompletedCleaningsByUserId(userId);
+            if (reportedCompletedBookings != null && !reportedCompletedBookings.isEmpty()) {
+                return ResponseEntity.ok(reportedCompletedBookings);
+            } else {
+                return ResponseEntity.noContent().build();
+            }
+        } catch (SecurityException e) {
+            logger.warn("Unauthorized attempt to fetch reported completed bookings: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
 
 }

@@ -5,6 +5,7 @@ import com.bookit.bookit.config.JwtService;
 import com.bookit.bookit.dto.*;
 import com.bookit.bookit.enums.UserRole;
 import com.bookit.bookit.service.städare.StädareService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,6 +74,49 @@ public class AdminController {
 
 
 
+    @GetMapping("/fetchNotAssignedBookings")
+    public ResponseEntity<?> fetchNotAssignedBookings(HttpServletRequest httpRequest) {
+        try {
+            String token = httpRequest.getHeader("Authorization").substring(7); // Using Bearer token
+            Integer adminUserId = jwtService.extractUserId(token);
+
+            // Verify if the user is an admin
+            if (!adminService.isAdmin(adminUserId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
+            }
+
+            List<BokningDTO> notAssignedBookings = bokningService.getNotAssignedBookings();
+            return ResponseEntity.ok(notAssignedBookings);
+        } catch (SecurityException e) {
+            logger.warn("Unauthorized attempt to fetch not assigned bookings: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    //Denna ska anropas i samband med ovan metod för att kunna fetcha en lista med lediga städare under bokningens period och tilldela.
+    // Se bild i kommentarerna i Jira under uppgift 61.
+    @GetMapping("/available-cleaners")
+    public ResponseEntity<?> getAvailableCleaners(@RequestBody BookingTimeDTO bookingTimeDTO, HttpServletRequest httpRequest) {
+
+        try {
+            String token = httpRequest.getHeader("Authorization").substring(7); // Extract the token
+            Integer userId = jwtService.extractUserId(token); // Extract userId from the token
+
+            LocalDateTime bookingTime = bookingTimeDTO.getBookingTime();
+            List<StädareDTO> availableCleaners = städareService.getAvailableCleanersForTime(bookingTime, userId);
+            return ResponseEntity.ok(availableCleaners);
+        } catch (SecurityException e) {
+            // Log the unauthorized access attempt
+            logger.warn("Unauthorized attempt to access available cleaners: " + e.getMessage());
+
+            // Return a 403 Forbidden response
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
+        }
+    }
+
+
     //Som en Admin tilldela ett städningsuppdrag till en städare
     //OBS: servicemetoden finns i StädareService
     //OBS2: Denna metod ska användas enbart av en Admin som ska hämta StädareId i frontenden och överföra till request body av denna endpoint.
@@ -100,26 +144,77 @@ public class AdminController {
 
 
 
-    //Denna ska anropas i samband med ovan metod för att kunna fetcha en lista med lediga städare under bokningens period och tilldela.
-    // Se bild i kommentarerna i Jira under uppgift 61.
-    @GetMapping("/available-cleaners")
-    public ResponseEntity<?> getAvailableCleaners(@RequestBody BookingTimeDTO bookingTimeDTO, HttpServletRequest httpRequest) {
 
+
+    //Används av Admin för att fetcha samtliga bokningar åt en kund eller städare
+    //inklusive aktiva och avslutade bokningar.
+
+    @PostMapping("/fetchBookingsForUser")
+    public ResponseEntity<?> fetchBookingsForUser(@RequestBody UserIdRequest userIdRequest, HttpServletRequest httpRequest) {
+        try {
+            String token = httpRequest.getHeader("Authorization").substring(7); // Using Bearer token
+            Integer adminUserId = jwtService.extractUserId(token);
+
+            // Verify if the user is an admin
+            if (!adminService.isAdmin(adminUserId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
+            }
+
+            List<BokningDTO> bookings = adminService.getBookingsForUserByAdmin(userIdRequest.getUserId());
+            return ResponseEntity.ok(bookings);
+        } catch (SecurityException e) {
+            logger.warn("Unauthorized attempt to fetch bookings for user [" + userIdRequest.getUserId() + "]: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/fetchNotStartedBookingsForUser")
+    public ResponseEntity<?> fetchNotStartedBookingsForUserByAdmin(@RequestBody UserIdRequest request, HttpServletRequest httpRequest) {
         try {
             String token = httpRequest.getHeader("Authorization").substring(7); // Extract the token
-            Integer userId = jwtService.extractUserId(token); // Extract userId from the token
+            Integer adminUserId = jwtService.extractUserId(token); // Extract admin user ID from the token
 
-            LocalDateTime bookingTime = bookingTimeDTO.getBookingTime();
-            List<StädareDTO> availableCleaners = städareService.getAvailableCleanersForTime(bookingTime, userId);
-            return ResponseEntity.ok(availableCleaners);
+            // Verify if the user is an admin
+            if (!adminService.isAdmin(adminUserId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
+            }
+
+            List<BokningDTO> notStartedBookings = bokningService.fetchNotStartedBookingsForUserByAdmin(request.getUserId());
+            return ResponseEntity.ok(notStartedBookings);
         } catch (SecurityException e) {
-            // Log the unauthorized access attempt
-            logger.warn("Unauthorized attempt to access available cleaners: " + e.getMessage());
+            // Log the exception for internal monitoring
+            logger.warn("Unauthorized attempt by admin to fetch not started bookings for user [" + request.getUserId() + "]: " + e.getMessage());
 
-            // Return a 403 Forbidden response
+            // Return a 403 Forbidden response with an appropriate body
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
         }
     }
+
+
+    @PostMapping("/fetchInProgressBookingsForUser")
+    public ResponseEntity<?> fetchInProgressBookingsForUserByAdmin(@RequestBody UserIdRequest request, HttpServletRequest httpRequest) {
+        try {
+            String token = httpRequest.getHeader("Authorization").substring(7); // Extract the token
+            Integer adminUserId = jwtService.extractUserId(token); // Extract admin user ID from the token
+
+            // Verify if the user is an admin
+            if (!adminService.isAdmin(adminUserId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
+            }
+
+            List<BokningDTO> inProgressBookings = bokningService.fetchInProgressBookingsForUserByAdmin(request.getUserId());
+            return ResponseEntity.ok(inProgressBookings);
+        } catch (SecurityException e) {
+            // Log the exception for internal monitoring
+            logger.warn("Unauthorized attempt by admin to fetch in-progress bookings for user [" + request.getUserId() + "]: " + e.getMessage());
+
+            // Return a 403 Forbidden response with an appropriate body
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
+        }
+    }
+
 
 
     //Från kundens perspektiv (alltså det är bara kunden som använder BookingStatus enumet borträknad admin)
@@ -139,6 +234,8 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Collections.singletonList("Unauthorized access."));
         }
     }
+
+
 
 
     //Från städarens perspektiv (alltså det är bara städaren som använder CleaningReportStatus enumet borträknad admin)

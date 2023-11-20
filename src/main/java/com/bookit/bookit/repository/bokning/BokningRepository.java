@@ -25,6 +25,7 @@ public interface BokningRepository extends JpaRepository<Bokning, Integer> {
             Kund kund, StädningsAlternativ städningsAlternativ, LocalDateTime bookingTime, LocalDateTime endTime);
 
 
+    List<Bokning> findAllByCleaningReportStatus(CleaningReportStatus status);
 
     List<Bokning> findAllByKundId(Integer kundId);
 

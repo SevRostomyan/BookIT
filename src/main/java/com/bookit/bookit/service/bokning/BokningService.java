@@ -45,16 +45,29 @@ public class BokningService {
     }
 
     public List<BokningDTO> getBookingsByUserId(Integer userId) {
-        UserEntity user = userRepository.findById(userId).orElse(null);
-        if (user == null) {
-            throw new EntityNotFoundException("User not found");
-        }
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         List<Bokning> bookings;
         if (UserRole.KUND == user.getRole()) {
             bookings = bokningRepository.findAllByKundId(userId);
+            // Filter by desired BookingStatus for KUND
+            List<BookingStatus> desiredStatusesForKund = Arrays.asList(
+                    BookingStatus.PENDING,
+                    BookingStatus.CONFIRMED,
+                    BookingStatus.CANCELLED);
+            bookings = bookings.stream()
+                    .filter(b -> desiredStatusesForKund.contains(b.getBookingStatus()))
+                    .collect(Collectors.toList());
         } else if (UserRole.STÄDARE == user.getRole()) {
             bookings = bokningRepository.findAllByStädareId(userId);
+            // Filter by desired CleaningReportStatus for STÄDARE
+            List<CleaningReportStatus> desiredStatusesForStädare = Arrays.asList(
+                    CleaningReportStatus.NOT_STARTED,
+                    CleaningReportStatus.IN_PROGRESS);
+            bookings = bookings.stream()
+                    .filter(b -> desiredStatusesForStädare.contains(b.getCleaningReportStatus()))
+                    .collect(Collectors.toList());
         } else {
             return Collections.emptyList();
         }
@@ -63,17 +76,13 @@ public class BokningService {
             throw new EntityNotFoundException("No bookings found for the user");
         }
 
-        // Filter by desired statuses
-        List<BookingStatus> desiredStatuses = Arrays.asList(BookingStatus.PENDING, BookingStatus.CONFIRMED, BookingStatus.UNDERKAND);
-        bookings = bookings.stream()
-                .filter(b -> desiredStatuses.contains(b.getBookingStatus()))
-                .collect(Collectors.toList());
-
         // Convert to DTOs
         return bookings.stream()
                 .map(bokningMapper::mapToDTO)
                 .collect(Collectors.toList());
     }
+
+
 
 
 
@@ -276,6 +285,46 @@ public class BokningService {
 
 
 
+    public List<BokningDTO> fetchNotStartedBookingsByUserId(Integer userId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+
+        List<Bokning> bookings;
+        if (user.getRole().equals(UserRole.KUND)) {
+            bookings = bokningRepository.findAllByKundIdAndCleaningReportStatus(userId, CleaningReportStatus.NOT_STARTED);
+        } else if (user.getRole().equals(UserRole.STÄDARE)) {
+            bookings = bokningRepository.findAllByStädareIdAndCleaningReportStatus(userId, CleaningReportStatus.NOT_STARTED);
+        } else {
+            throw new SecurityException("Unauthorized access to fetch not started bookings.");
+        }
+
+        // Convert to DTOs
+        return bookings.stream()
+                .map(bokningMapper::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+
+    public List<BokningDTO> fetchInProgressBookingsByUserId(Integer userId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+
+        List<Bokning> bookings;
+        if (user.getRole().equals(UserRole.KUND)) {
+            bookings = bokningRepository.findAllByKundIdAndCleaningReportStatus(userId, CleaningReportStatus.IN_PROGRESS);
+        } else if (user.getRole().equals(UserRole.STÄDARE)) {
+            bookings = bokningRepository.findAllByStädareIdAndCleaningReportStatus(userId, CleaningReportStatus.IN_PROGRESS);
+        } else {
+            throw new SecurityException("Unauthorized access to fetch in-progress bookings.");
+        }
+
+        // Convert to DTOs
+        return bookings.stream()
+                .map(bokningMapper::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+
     //Returnerar en lista med bokningar som kunden har markerat som avklarade. Kan anropas av bara KUND eller STÄDARE.
     // Admin har en separat method för det i Admin controller och service
     public List<BokningDTO> fetchCompletedBookingsByUserId(Integer userId) {
@@ -304,14 +353,16 @@ public class BokningService {
     //Returnerar en lista med bokningar som städaren har markerat som avklarade. Kan anropas av bara KUND eller STÄDARE.
     //Admin har en separat method för det i Admin controller och service
     public List<BokningDTO> fetchCompletedCleaningsByUserId(Integer userId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+
         List<Bokning> bookings;
-        String role = getUserRoleById(userId);
-        if ("KUND".equals(role)) {
-            bookings = bokningRepository.findAllByKundIdAndCleaningReportStatus(userId, CleaningReportStatus.REPORTED_COMPLETED_AND_READY_FOR_CUSTOMER_REVIEW); //Kanske behöver ändra värdet till approved
-        } else if ("STÄDARE".equals(role)) {
+        if (user.getRole().equals(UserRole.KUND)) {
+            bookings = bokningRepository.findAllByKundIdAndCleaningReportStatus(userId, CleaningReportStatus.REPORTED_COMPLETED_AND_READY_FOR_CUSTOMER_REVIEW);
+        } else if (user.getRole().equals(UserRole.STÄDARE)) {
             bookings = bokningRepository.findAllByStädareIdAndCleaningReportStatus(userId, CleaningReportStatus.REPORTED_COMPLETED_AND_READY_FOR_CUSTOMER_REVIEW);
         } else {
-            return Collections.emptyList();
+            throw new SecurityException("Unauthorized access to fetch reported completed bookings.");
         }
 
         // Convert to DTOs
@@ -319,6 +370,7 @@ public class BokningService {
                 .map(bokningMapper::mapToDTO)
                 .collect(Collectors.toList());
     }
+
 }
 
 

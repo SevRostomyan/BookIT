@@ -15,6 +15,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,6 +27,94 @@ public class AdminService {
     private final UserRepository userRepository;
     private final BokningRepository bokningRepository;
     private final BokningMapper bokningMapper;
+
+
+
+    public List<BokningDTO> getBookingsForUserByAdmin(Integer targetUserId) {
+        UserEntity targetUser = userRepository.findById(targetUserId)
+                .orElseThrow(() -> new EntityNotFoundException("Target user not found"));
+
+        List<Bokning> bookings;
+        if (UserRole.KUND == targetUser.getRole()) {
+            bookings = bokningRepository.findAllByKundId(targetUserId);
+        } else if (UserRole.STÄDARE == targetUser.getRole()) {
+            bookings = bokningRepository.findAllByStädareId(targetUserId);
+        } else {
+            return Collections.emptyList();
+        }
+
+        if (bookings.isEmpty()) {
+            throw new EntityNotFoundException("No bookings found for the user");
+        }
+
+
+        // Convert to DTOs
+        return bookings.stream()
+                .map(bokningMapper::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    public List<BokningDTO> getNotAssignedBookings() {
+        List<Bokning> bookings = bokningRepository.findAllByCleaningReportStatus(CleaningReportStatus.NOT_ASSIGNED);
+
+        if (bookings.isEmpty()) {
+            throw new EntityNotFoundException("No not assigned bookings found");
+        }
+
+        // Convert to DTOs
+        return bookings.stream()
+                .map(bokningMapper::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+
+    public List<BokningDTO> fetchNotStartedBookingsForUserByAdmin(Integer targetUserId) {
+        UserEntity targetUser = userRepository.findById(targetUserId)
+                .orElseThrow(() -> new EntityNotFoundException("Target user not found"));
+
+        List<Bokning> bookings;
+        if (UserRole.KUND == targetUser.getRole()) {
+            bookings = bokningRepository.findAllByKundIdAndCleaningReportStatus(targetUserId, CleaningReportStatus.NOT_STARTED);
+        } else if (UserRole.STÄDARE == targetUser.getRole()) {
+            bookings = bokningRepository.findAllByStädareIdAndCleaningReportStatus(targetUserId, CleaningReportStatus.NOT_STARTED);
+        } else {
+            return Collections.emptyList();
+        }
+
+        if (bookings.isEmpty()) {
+            throw new EntityNotFoundException("No not started bookings found for the user");
+        }
+
+        // Convert to DTOs
+        return bookings.stream()
+                .map(bokningMapper::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+
+    public List<BokningDTO> fetchInProgressBookingsForUserByAdmin(Integer targetUserId) {
+        UserEntity targetUser = userRepository.findById(targetUserId)
+                .orElseThrow(() -> new EntityNotFoundException("Target user not found"));
+
+        List<Bokning> bookings;
+        if (UserRole.KUND == targetUser.getRole()) {
+            bookings = bokningRepository.findAllByKundIdAndCleaningReportStatus(targetUserId, CleaningReportStatus.IN_PROGRESS);
+        } else if (UserRole.STÄDARE == targetUser.getRole()) {
+            bookings = bokningRepository.findAllByStädareIdAndCleaningReportStatus(targetUserId, CleaningReportStatus.IN_PROGRESS);
+        } else {
+            return Collections.emptyList();
+        }
+
+        if (bookings.isEmpty()) {
+            throw new EntityNotFoundException("No in-progress bookings found for the user");
+        }
+
+        // Convert to DTOs
+        return bookings.stream()
+                .map(bokningMapper::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
 
 
     //Från kundens perspektiv (alltså det är bara kunden som använder BookingStatus enumet borträknad admin)
