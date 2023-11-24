@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.YearMonth;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/bokning")
@@ -128,7 +130,10 @@ public class BokningController {
     }
 
 
-    //Från kundens perspektiv (alltså det är bara kunden som använder BookingStatus enumet borträknad admin)
+    //Från kundens perspektiv
+    //Returnerar en lista med bokningar som kunden har markerat som avklarade. Kan anropas av bara KUND eller STÄDARE.
+    // Admin har en separat method för det i Admin controller och service
+
     @PostMapping("/fetchCompletedBookingsByUserId")
     public ResponseEntity<?> fetchCompletedBookingsByUserId(HttpServletRequest httpRequest) {
         try {
@@ -171,6 +176,24 @@ public class BokningController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
         } catch (EntityNotFoundException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+
+
+    //On the front end, when you open the list of completed bookings, you can also call the /calculateTotalIncome endpoint
+    // ...to fetch the total income and display it alongside the list.
+    @PostMapping("/calculateMonthlyIncome")
+    public ResponseEntity<?> calculateMonthlyIncome(HttpServletRequest httpRequest) {
+        try {
+            String token = httpRequest.getHeader("Authorization").substring(7);
+            Integer userId = jwtService.extractUserId(token);
+
+            Map<YearMonth, Integer> monthlyIncome = bokningService.calculateMonthlyIncomeFromCompletedBookings(userId);
+            return ResponseEntity.ok(monthlyIncome);
+        } catch (SecurityException e) {
+            logger.warn("Unauthorized attempt to calculate monthly income: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
         }
     }
 

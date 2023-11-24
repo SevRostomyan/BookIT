@@ -12,6 +12,7 @@ import com.bookit.bookit.repository.admin.AdminRepository;
 import com.bookit.bookit.repository.bokning.BokningRepository;
 import com.bookit.bookit.repository.user.UserRepository;
 import com.bookit.bookit.service.notifications.NotificationsService;
+import com.bookit.bookit.service.tjänst.TjänstService;
 import com.bookit.bookit.utils.BokningMapper;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +20,8 @@ import org.springframework.stereotype.Service;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.time.YearMonth;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,7 +33,7 @@ public class BokningService {
     private final AdminRepository adminRepository;
     private final BokningMapper bokningMapper;
     private final NotificationsService notificationsService;
-
+    private final TjänstService tjänstService;
 
     public String getUserRoleById(Integer userId) {
         Optional<UserEntity> userOptional = userRepository.findById(userId);
@@ -348,8 +347,6 @@ public class BokningService {
 
 
 
-
-
     //Returnerar en lista med bokningar som städaren har markerat som avklarade. Kan anropas av bara KUND eller STÄDARE.
     //Admin har en separat method för det i Admin controller och service
     public List<BokningDTO> fetchCompletedCleaningsByUserId(Integer userId) {
@@ -371,7 +368,40 @@ public class BokningService {
                 .collect(Collectors.toList());
     }
 
+
+
+
+
+    public Map<YearMonth, Integer> calculateMonthlyIncomeFromCompletedBookings(Integer userId) {
+        List<Bokning> completedBookings = fetchCompletedBookings(userId, BookingStatus.COMPLETED);
+
+        return completedBookings.stream()
+                .collect(Collectors.groupingBy(
+                        booking -> YearMonth.from(booking.getBookingTime()),
+                        Collectors.summingInt(booking -> tjänstService.getPriceForCleaningType(booking.getTjänst().getStädningsAlternativ()))
+                ));
+    }
+
+    private List<Bokning> fetchCompletedBookings(Integer userId, BookingStatus status) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+        if (user.getRole().equals(UserRole.KUND)) {
+            return bokningRepository.findAllByKundIdAndBookingStatus(userId, status);
+        } else if (user.getRole().equals(UserRole.STÄDARE)) {
+            return bokningRepository.findAllByStädareIdAndBookingStatus(userId, status);
+        } else {
+            throw new SecurityException("Unauthorized access to fetch bookings.");
+        }
+    }
+
+
+
+
+
 }
+
+
+
 
 
 
