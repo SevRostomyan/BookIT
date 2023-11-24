@@ -181,8 +181,7 @@ public class BokningController {
 
 
 
-    //On the front end, when you open the list of completed bookings, you can also call the /calculateTotalIncome endpoint
-    // ...to fetch the total income and display it alongside the list.
+   //Infon ska visas som en tabell i Städarens Dashboard
     @PostMapping("/calculateMonthlyIncome")
     public ResponseEntity<?> calculateMonthlyIncome(HttpServletRequest httpRequest) {
         try {
