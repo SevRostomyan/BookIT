@@ -35,6 +35,7 @@ public class Bokning {
 
     private LocalDateTime bookingTime;
     private LocalDateTime endTime;
+    private LocalDateTime cleaningReportedTime;
 
     private String adress;
 

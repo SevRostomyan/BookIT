@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -239,6 +240,7 @@ public class BokningService {
 
         // Cleaner reports the cleaning as completed and ready for customer review
         booking.setCleaningReportStatus(CleaningReportStatus.REPORTED_COMPLETED_AND_READY_FOR_CUSTOMER_REVIEW);
+        booking.setCleaningReportedTime(LocalDateTime.now());
         bokningRepository.save(booking);
 
         // After saving, send an email to the customer for review
