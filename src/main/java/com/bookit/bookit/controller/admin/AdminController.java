@@ -77,6 +77,23 @@ public class AdminController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+   /* @GetMapping("/kunder/all")
+    public ResponseEntity<?> getAllKunder(HttpServletRequest httpRequest) {
+        try {
+            String token = httpRequest.getHeader("Authorization").substring(7);
+            Integer adminUserId = jwtService.extractUserId(token);
+
+            // Verify if the user is an admin
+            if (!adminService.isAdmin(adminUserId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
+            }
+
+            List<KundDTO> allKunder = adminService.getAllUsersByRole(UserRole.KUND);
+            return ResponseEntity.ok(allKunder);
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
+        }
+    }*/
 
 
     @GetMapping("/fetchNotAssignedBookings")
