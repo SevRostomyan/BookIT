@@ -17,7 +17,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.YearMonth;
-import java.util.Arrays;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +30,7 @@ public class AdminService {
     private final UserRepository userRepository;
     private final BokningRepository bokningRepository;
     private final BokningMapper bokningMapper;
-    private final TjänstService tjänstService;
+    private final TjänstService tjanstService;
 
 
     public List<BokningDTO> getBookingsForUserByAdmin(Integer targetUserId) {
@@ -204,7 +204,7 @@ public class AdminService {
         return completedBookings.stream()
                 .collect(Collectors.groupingBy(
                         booking -> YearMonth.from(booking.getBookingTime()),
-                        Collectors.summingInt(booking -> tjänstService.getPriceForCleaningType(booking.getTjänst().getStädningsAlternativ()))
+                        Collectors.summingInt(booking -> tjanstService.getPriceForCleaningType(booking.getTjänst().getStädningsAlternativ()))
                 ));
     }
 
