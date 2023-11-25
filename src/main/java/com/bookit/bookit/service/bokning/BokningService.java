@@ -15,7 +15,7 @@ import com.bookit.bookit.service.notifications.NotificationsService;
 import com.bookit.bookit.service.tjänst.TjänstService;
 import com.bookit.bookit.utils.BokningMapper;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,13 +35,15 @@ public class BokningService {
     private final NotificationsService notificationsService;
     private final TjänstService tjänstService;
 
-    public String getUserRoleById(Integer userId) {
+
+    //Behövs ej
+    /* public String getUserRoleById(Integer userId) {
         Optional<UserEntity> userOptional = userRepository.findById(userId);
         if (userOptional.isPresent()) {
             return userOptional.get().getRole().name();
         }
         return null;
-    }
+    }*/
 
     public List<BokningDTO> getBookingsByUserId(Integer userId) {
         UserEntity user = userRepository.findById(userId)

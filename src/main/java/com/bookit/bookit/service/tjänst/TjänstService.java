@@ -5,24 +5,24 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+
 @Service
-@AllArgsConstructor
+//@AllArgsConstructor
 public class TjänstService {
 
-
-    //Tjänsterpriser injekterade från Cleaning-prices.properties filen
-    @Value("${basic}")
+    @Value("${cleaning.basic}")
     private int basicPrice;
 
-    @Value("${topp}")
+    @Value("${cleaning.topp}")
     private int toppPrice;
 
-    @Value("${diamant}")
+    @Value("${cleaning.diamant}")
     private int diamantPrice;
 
-    @Value("${fonstertvatt}")
+    @Value("${cleaning.fonstertvatt}")
     private int fonstertvattPrice;
-// ... other prices
+
+    // ... other prices
 
     public int getPriceForCleaningType(StädningsAlternativ type) {
         switch (type) {
@@ -30,9 +30,14 @@ public class TjänstService {
                 return basicPrice;
             case TOPP:
                 return toppPrice;
+            case DIAMANT:
+                return diamantPrice;
+            case FÖNSTERTVÄTT:
+                return fonstertvattPrice;
             // ... other cases
             default:
                 throw new IllegalArgumentException("Unknown cleaning type: " + type);
         }
     }
 }
+

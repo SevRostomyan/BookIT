@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @Repository
 public interface AdminRepository extends JpaRepository<Admin, Integer> {
-    Optional<Admin> findAdminByEmail(String email);
+    //Optional<Admin> findAdminByEmail(String email);
 
     List<UserEntity> findAllByRole(UserRole admin);
     // Check if an admin with the given user ID exists

@@ -3,7 +3,9 @@ package com.bookit.bookit.controller.admin;
 
 import com.bookit.bookit.config.JwtService;
 import com.bookit.bookit.dto.*;
+import com.bookit.bookit.entity.user.UserEntity;
 import com.bookit.bookit.enums.UserRole;
+import com.bookit.bookit.repository.user.UserRepository;
 import com.bookit.bookit.service.städare.StädareService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 
 
+import java.time.YearMonth;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -38,13 +41,15 @@ public class AdminController {
     private final JwtService jwtService;
     private final StädareService städareService;
     private final AdminService bokningService;
+    private final UserRepository userRepository;
 
     @Autowired
-    public AdminController(AdminService adminService, JwtService jwtService, StädareService städareService, AdminService bokningService) {
+    public AdminController(AdminService adminService, JwtService jwtService, StädareService städareService, AdminService bokningService, UserRepository userRepository) {
         this.adminService = adminService;
         this.jwtService = jwtService;
         this.städareService = städareService;
         this.bokningService = bokningService;
+        this.userRepository = userRepository;
     }
 
 
@@ -292,5 +297,33 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
         }
     }
+
+
+
+    @PostMapping("/calculateCleanerMonthlyIncome")
+    public ResponseEntity<?> calculateCleanerMonthlyIncome(HttpServletRequest httpRequest, @RequestBody CleanerIncomeRequest request) {
+        try {
+            String token = httpRequest.getHeader("Authorization").substring(7);
+            Integer adminUserId = jwtService.extractUserId(token);
+
+            // Verify if the user is an admin
+            UserEntity adminUser = userRepository.findById(adminUserId)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + adminUserId));
+            if (!adminUser.getRole().equals(UserRole.ADMIN)) {
+                throw new SecurityException("Unauthorized access - Admin privileges required.");
+            }
+
+            Map<YearMonth, Integer> monthlyIncome = bokningService.calculateCleanerMonthlyIncome(request.getCleanerId());
+            return ResponseEntity.ok(monthlyIncome);
+        } catch (SecurityException | EntityNotFoundException e) {
+            logger.warn("Unauthorized attempt to calculate cleaner's monthly income: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        }
+    }
+
+
+
+
+
 
 }

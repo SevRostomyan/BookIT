@@ -10,14 +10,17 @@ import com.bookit.bookit.enums.CleaningReportStatus;
 import com.bookit.bookit.enums.UserRole;
 import com.bookit.bookit.repository.bokning.BokningRepository;
 import com.bookit.bookit.repository.user.UserRepository;
+import com.bookit.bookit.service.tjänst.TjänstService;
 import com.bookit.bookit.utils.BokningMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.YearMonth;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,7 +30,7 @@ public class AdminService {
     private final UserRepository userRepository;
     private final BokningRepository bokningRepository;
     private final BokningMapper bokningMapper;
-
+    private final TjänstService tjänstService;
 
 
     public List<BokningDTO> getBookingsForUserByAdmin(Integer targetUserId) {
@@ -191,6 +194,23 @@ public class AdminService {
     public List<KundDTO> searchUsersByRole(String query, UserRole role) {
         List<UserEntity> users = userRepository.findByFirstnameContainingOrLastnameContainingOrEmailContainingAndRole(query, query, query, role);
         return users.stream().map(bokningMapper::mapUserEntityToKundDTO).collect(Collectors.toList());
+    }
+
+
+
+
+    public Map<YearMonth, Integer> calculateCleanerMonthlyIncome(Integer cleanerId) {
+        List<Bokning> completedBookings = fetchCompletedBookingsForCleaner(cleanerId, BookingStatus.COMPLETED);
+        return completedBookings.stream()
+                .collect(Collectors.groupingBy(
+                        booking -> YearMonth.from(booking.getBookingTime()),
+                        Collectors.summingInt(booking -> tjänstService.getPriceForCleaningType(booking.getTjänst().getStädningsAlternativ()))
+                ));
+    }
+
+    private List<Bokning> fetchCompletedBookingsForCleaner(Integer cleanerId, BookingStatus status) {
+        // Fetch bookings for the specified cleaner
+        return bokningRepository.findAllByStädareIdAndBookingStatus(cleanerId, status);
     }
 
 
