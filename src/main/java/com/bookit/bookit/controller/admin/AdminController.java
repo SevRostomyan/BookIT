@@ -6,6 +6,7 @@ import com.bookit.bookit.dto.*;
 import com.bookit.bookit.entity.user.UserEntity;
 import com.bookit.bookit.enums.UserRole;
 import com.bookit.bookit.repository.user.UserRepository;
+import com.bookit.bookit.service.kund.KundService;
 import com.bookit.bookit.service.städare.StädareService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -42,14 +43,16 @@ public class AdminController {
     private final StädareService städareService;
     private final AdminService bokningService;
     private final UserRepository userRepository;
+    private final KundService kundService;
 
     @Autowired
-    public AdminController(AdminService adminService, JwtService jwtService, StädareService städareService, AdminService bokningService, UserRepository userRepository) {
+    public AdminController(AdminService adminService, JwtService jwtService, StädareService städareService, AdminService bokningService, UserRepository userRepository, KundService kundService) {
         this.adminService = adminService;
         this.jwtService = jwtService;
         this.städareService = städareService;
         this.bokningService = bokningService;
         this.userRepository = userRepository;
+        this.kundService = kundService;
     }
 
 
@@ -298,6 +301,7 @@ public class AdminController {
         return searchUsersByRole(query, httpRequest, UserRole.STÄDARE);
     }
 
+    //Kundsökning
     private ResponseEntity<?> searchUsersByRole(String query, HttpServletRequest httpRequest, UserRole role) {
         try {
             String token = httpRequest.getHeader("Authorization").substring(7);
@@ -315,6 +319,44 @@ public class AdminController {
         }
     }
 
+
+    //Hämta samtliga kunder
+    @GetMapping("/kunder/all")
+    public ResponseEntity<?> getAllKunder(HttpServletRequest httpRequest) {
+        try {
+            String token = httpRequest.getHeader("Authorization").substring(7);
+            Integer adminUserId = jwtService.extractUserId(token);
+
+            // Verify if the user is an admin
+            if (!adminService.isAdmin(adminUserId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
+            }
+
+            List<KundDTO> allKunder = adminService.getAllUsersByRole(UserRole.KUND);
+            return ResponseEntity.ok(allKunder);
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
+        }
+    }
+
+
+    @PostMapping("/kunder/add")
+    public ResponseEntity<?> addKund(@RequestBody KundDTO kundDTO, HttpServletRequest httpRequest) {
+        try {
+            String token = httpRequest.getHeader("Authorization").substring(7);
+            Integer adminUserId = jwtService.extractUserId(token);
+
+            // Verify if the user is an admin
+            if (!adminService.isAdmin(adminUserId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
+            }
+
+            KundDTO createdKund = adminService.addKund(kundDTO);
+            return ResponseEntity.ok(createdKund);
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
+        }
+    }
 
 
     @PostMapping("/calculateCleanerMonthlyIncome")

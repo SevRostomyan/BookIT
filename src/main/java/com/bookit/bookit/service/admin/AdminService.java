@@ -4,16 +4,19 @@ package com.bookit.bookit.service.admin;
 import com.bookit.bookit.dto.BokningDTO;
 import com.bookit.bookit.dto.KundDTO;
 import com.bookit.bookit.entity.bokning.Bokning;
+import com.bookit.bookit.entity.kund.Kund;
 import com.bookit.bookit.entity.user.UserEntity;
 import com.bookit.bookit.enums.BookingStatus;
 import com.bookit.bookit.enums.CleaningReportStatus;
 import com.bookit.bookit.enums.UserRole;
 import com.bookit.bookit.repository.bokning.BokningRepository;
+import com.bookit.bookit.repository.kund.KundRepository;
 import com.bookit.bookit.repository.user.UserRepository;
 import com.bookit.bookit.service.tjänst.TjänstService;
 import com.bookit.bookit.utils.BokningMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import org.antlr.v4.runtime.misc.LogManager;
 import org.springframework.stereotype.Service;
 
 import java.time.YearMonth;
@@ -31,6 +34,7 @@ public class AdminService {
     private final BokningRepository bokningRepository;
     private final BokningMapper bokningMapper;
     private final TjänstService tjanstService;
+    private final KundRepository kundRepository;
 
 
     public List<BokningDTO> getBookingsForUserByAdmin(Integer targetUserId) {
@@ -214,6 +218,24 @@ public class AdminService {
     }
 
 
+
+//Fetch a list of all customers
+    public List<KundDTO> getAllUsersByRole(UserRole role) {
+        List<UserEntity> users = userRepository.findByRole(role);
+        return users.stream()
+                .map(bokningMapper::mapUserEntityToKundDTO) // Use the mapper method
+                .collect(Collectors.toList());
+    }
+
+    //Create a new customer
+    public KundDTO addKund(KundDTO kundDTO) {
+        // Convert KundDTO to Kund entity if necessary
+        Kund kund = bokningMapper.mapToKund(kundDTO);
+        // Save the new customer
+        Kund savedKund = kundRepository.save(kund);
+        // Convert back to DTO if necessary and return
+        return bokningMapper.mapToKundDTO(savedKund);
+    }
 
 
 }

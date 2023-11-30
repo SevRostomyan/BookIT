@@ -20,4 +20,5 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
     List<UserEntity> findByFirstnameContainingOrLastnameContainingOrEmailContainingAndRole(String firstname, String lastname, String email, UserRole role);
 
 
+    List<UserEntity> findByRole(UserRole role);
 }

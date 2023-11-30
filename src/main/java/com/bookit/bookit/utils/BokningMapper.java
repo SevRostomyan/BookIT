@@ -59,4 +59,13 @@ public class BokningMapper {
         return dto;
     }
 
+    public Kund mapToKund(KundDTO kundDTO) {
+        Kund kund = new Kund();
+        kund.setId(kundDTO.getId());
+        kund.setFirstname(kundDTO.getFirstname());
+        kund.setLastname(kundDTO.getLastname());
+        kund.setEmail(kundDTO.getEmail());
+        return kund;
+    }
+
 }
