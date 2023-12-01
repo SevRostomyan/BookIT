@@ -17,8 +17,9 @@ import com.bookit.bookit.utils.BokningMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.antlr.v4.runtime.misc.LogManager;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import com.bookit.bookit.exception.UserAlreadyExistsException;
 import java.time.YearMonth;
 
 import java.util.Collections;
@@ -35,6 +36,7 @@ public class AdminService {
     private final BokningMapper bokningMapper;
     private final TjänstService tjanstService;
     private final KundRepository kundRepository;
+    private final PasswordEncoder passwordEncoder;
 
 
     public List<BokningDTO> getBookingsForUserByAdmin(Integer targetUserId) {
@@ -229,8 +231,16 @@ public class AdminService {
 
     //Create a new customer
     public KundDTO addKund(KundDTO kundDTO) {
+
+        // Check if user with the given email already exists
+        if (userRepository.findUserByEmail(kundDTO.getEmail()).isPresent()) {
+            throw new UserAlreadyExistsException("User with email " + kundDTO.getEmail() + " already exists");
+        }
+
         // Convert KundDTO to Kund entity if necessary
         Kund kund = bokningMapper.mapToKund(kundDTO);
+        // Encode the password before saving
+        kund.setPassword(passwordEncoder.encode(kundDTO.getPassword()));
         // Save the new customer
         Kund savedKund = kundRepository.save(kund);
         // Convert back to DTO if necessary and return

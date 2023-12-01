@@ -41,7 +41,7 @@ public class KundService {
 
         // Fetch the customer based on userId
         Kund kund = kundRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("Kund not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Kund med det angivna userId saknas."));
 
         // Align booking time to the nearest 2-hour slot
         LocalDateTime bookingTime = request.getBookingTime().truncatedTo(ChronoUnit.HOURS);
@@ -53,7 +53,7 @@ public class KundService {
         // Check for duplicate bookings based on time
         if (bokningRepository.existsByKundAndTjänst_StädningsAlternativAndBookingTimeAndEndTime(
                 kund, request.getStädningsAlternativ(), bookingTime, endTime)) {
-            return "You have already booked this cleaning service at this time.";
+            return "Du har redan bokat denna städningstjänst vid det angivna tiden.";
         }
 
         // Create a new Tjänst for each booking
@@ -77,7 +77,7 @@ public class KundService {
         // Prepare and send booking confirmation email
         prepareAndSendBookingConfirmationEmail(kund, newBooking);
 
-        return "Booking successful.";
+        return "Bokningen lyckades.";
     }
 
     // This method should be outside the transactional context

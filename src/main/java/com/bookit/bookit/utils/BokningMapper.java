@@ -31,14 +31,6 @@ public class BokningMapper {
         return dto;
     }
 
-    public KundDTO mapToKundDTO(Kund kund) {
-        KundDTO dto = new KundDTO();
-        dto.setId(kund.getId());
-        dto.setFirstname(kund.getFirstname());
-        dto.setLastname(kund.getLastname());
-        dto.setEmail(kund.getEmail());
-        return dto;
-    }
 
     public StädareDTO mapToStädareDTO(Städare städare) {
         StädareDTO dto = new StädareDTO();
@@ -53,18 +45,34 @@ public class BokningMapper {
     public KundDTO mapUserEntityToKundDTO(UserEntity user) {
         KundDTO dto = new KundDTO();
         dto.setId(user.getId());
-        dto.setFirstname(user.getFirstname()); // Adjust these according to the actual structure of UserEntity
+        dto.setFirstname(user.getFirstname());
         dto.setLastname(user.getLastname());
         dto.setEmail(user.getEmail());
         return dto;
     }
 
+
+    //Mappar kundEntity till KundDTO
+    public KundDTO mapToKundDTO(Kund kund) {
+        KundDTO dto = new KundDTO();
+        dto.setId(kund.getId());
+        dto.setFirstname(kund.getFirstname());
+        dto.setLastname(kund.getLastname());
+        dto.setEmail(kund.getEmail());
+        dto.setPassword(kund.getPassword());
+        dto.setRole(kund.getRole());
+        return dto;
+    }
+
+    //Mappar KundDTO till KundEntity
     public Kund mapToKund(KundDTO kundDTO) {
         Kund kund = new Kund();
         kund.setId(kundDTO.getId());
         kund.setFirstname(kundDTO.getFirstname());
         kund.setLastname(kundDTO.getLastname());
         kund.setEmail(kundDTO.getEmail());
+        kund.setPassword(kund.getPassword());
+        kund.setRole(kundDTO.getRole());
         return kund;
     }
 
