@@ -12,5 +12,6 @@ import lombok.NoArgsConstructor;
 public class AuthenticationResponse {
 
     private String token; //Token som ska skickas tillbaka till usern
-
+    private String role; //User rollen också skickas som en del av jwt token
+    private String errorMessage; // New field for error messages in case a user is unauthorised
 }

@@ -48,6 +48,7 @@ public class JwtService {
         if (userDetails instanceof UserEntity) {
             UserEntity user = (UserEntity) userDetails;
             claims.put("userId", user.getId());
+            claims.put("role", user.getRole().name());
         }
         return generateToken(claims, userDetails);
     }

@@ -96,7 +96,8 @@ public class AuthService {
                            request.getPassword()
                    )
                    //Att this point the username(the email) and password are correct..
-                   //So if both of them are correct I just need to generate a token and send it back to the client
+                   //So if both of them are correct I just need to check the role and if it is also correct generate a token
+                   // and send it back to the client
            );
        }catch (AuthenticationException e){
            throw new BadCredentialsException("Invalid username/password");
@@ -104,9 +105,17 @@ public class AuthService {
         var user = repository.findUserByEmail(request.getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
+        // Check if the user's actual role matches the intended role
+        if (!user.getRole().name().equalsIgnoreCase(request.getIntendedRole())) {
+            return AuthenticationResponse.builder()
+                    .errorMessage("Obehörig åtkomst. Vänligen välj rätt inloggningsroll.")
+                    .build();
+        }
+
        var jwtToken = jwtService.generateToken(user); //When I get the user I can use this user object to generate a token...
         return AuthenticationResponse.builder()
                 .token(jwtToken) //...and return this authentication response
+                .role(user.getRole().name())
                 .build();
     }
 }
