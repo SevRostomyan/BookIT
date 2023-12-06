@@ -48,8 +48,6 @@ public class BokningController {
         }
     }
 
-
-
     //Kunden eller städaren kan använda nedan metod för att hämta aktuella bokningar kopplade till deras id.
     // Admin har en annan method för att hämta bådas data
     //Endpointen tar in info via body och token via header
