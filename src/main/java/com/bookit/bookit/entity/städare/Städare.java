@@ -19,11 +19,10 @@ import java.util.List;
 public class Städare extends UserEntity {
 
 
-    @OneToMany(mappedBy = "städare")
+    @OneToMany(mappedBy = "städare", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonBackReference
     private List<Bokning> bokningar;
 
-  /*  @OneToOne(cascade = CascadeType.ALL)
-    private User user; //Kopplat till User klassen för inloggningssyfte*/
+
 
 }

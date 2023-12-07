@@ -19,7 +19,7 @@ import java.util.List;
 public class Kund extends UserEntity {
 
 
-    @OneToMany(mappedBy = "kund")
+    @OneToMany(mappedBy = "kund", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonBackReference
     private List<Bokning> bokningar;
 
