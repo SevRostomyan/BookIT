@@ -23,7 +23,7 @@ import org.springframework.http.HttpStatus;
 //import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
-
+import com.bookit.bookit.exception.UserNotFoundException;
 
 import java.time.YearMonth;
 import java.util.Collections;
@@ -340,8 +340,8 @@ public class AdminController {
     }
 
 
-    @PostMapping("/kunder/add")
-    public ResponseEntity<?> addKund(@RequestBody KundDTO kundDTO, HttpServletRequest httpRequest) {
+    @PostMapping("/users/add")
+    public ResponseEntity<?> addUser(@RequestBody RegisterRequest request, HttpServletRequest httpRequest) {
         try {
             String token = httpRequest.getHeader("Authorization").substring(7);
             Integer adminUserId = jwtService.extractUserId(token);
@@ -351,14 +351,106 @@ public class AdminController {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
             }
 
-            KundDTO createdKund = adminService.addKund(kundDTO);
-            return ResponseEntity.ok(createdKund);
+            AuthenticationResponse createdUser = adminService.registerUser(request);
+            return ResponseEntity.ok(createdUser);
         } catch (SecurityException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
         }
     }
 
 
+    // Endpoint to update user information
+    @PutMapping("/users/update")
+    public ResponseEntity<?> updateUser(@RequestBody UserUpdateRequest updateRequest, HttpServletRequest httpRequest) {
+        try {
+            String token = httpRequest.getHeader("Authorization").substring(7); // Extract JWT token
+            Integer adminUserId = jwtService.extractUserId(token);
+
+            // Verify if the user is an admin
+            if (!adminService.isAdmin(adminUserId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
+            }
+
+            adminService.updateUser(updateRequest);
+            return ResponseEntity.ok("User updated successfully.");
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred.");
+        }
+    }
+
+
+
+
+    //Delet KUND
+    @DeleteMapping("/kund/delete")
+    public ResponseEntity<?> deleteKund(@RequestBody UserDeleteRequest deleteRequest, HttpServletRequest httpRequest) {
+        try {
+            String token = httpRequest.getHeader("Authorization").substring(7);
+            Integer adminUserId = jwtService.extractUserId(token);
+
+            if (!adminService.isAdmin(adminUserId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
+            }
+
+            adminService.deleteKund(deleteRequest);
+            return ResponseEntity.ok("Kund deleted successfully.");
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
+        }
+    }
+
+
+    //Delete STÄDARE
+    @DeleteMapping("/städare/delete")
+    public ResponseEntity<?> deleteStädare(@RequestBody UserDeleteRequest deleteRequest, HttpServletRequest httpRequest) {
+        try {
+            String token = httpRequest.getHeader("Authorization").substring(7);
+            Integer adminUserId = jwtService.extractUserId(token);
+
+            if (!adminService.isAdmin(adminUserId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
+            }
+
+            adminService.deleteStädare(deleteRequest);
+            return ResponseEntity.ok("Städare deleted successfully.");
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
+        }
+    }
+
+    // Endpoint to delete an Admin
+    @DeleteMapping("/users/deleteAdmin")
+    public ResponseEntity<?> deleteAdmin(@RequestBody UserDeleteRequest deleteRequest, HttpServletRequest httpRequest) {
+        try {
+            String token = httpRequest.getHeader("Authorization").substring(7);
+            Integer adminUserId = jwtService.extractUserId(token);
+
+            if (!adminService.isAdmin(adminUserId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
+            }
+
+            adminService.deleteAdmin(deleteRequest);
+            return ResponseEntity.ok("User deleted successfully.");
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred.");
+        }
+    }
     @PostMapping("/calculateCleanerMonthlyIncome")
     public ResponseEntity<?> calculateCleanerMonthlyIncome(HttpServletRequest httpRequest, @RequestBody CleanerIncomeRequest request) {
         try {

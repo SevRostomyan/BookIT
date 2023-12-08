@@ -3,6 +3,7 @@ package com.bookit.bookit.repository.bokning;
 import com.bookit.bookit.entity.bokning.Bokning;
 import com.bookit.bookit.entity.kund.Kund;
 import com.bookit.bookit.entity.städare.Städare;
+import com.bookit.bookit.entity.user.UserEntity;
 import com.bookit.bookit.enums.BookingStatus;
 import com.bookit.bookit.enums.CleaningReportStatus;
 
@@ -52,6 +53,8 @@ public interface BokningRepository extends JpaRepository<Bokning, Integer> {
 
     List<Bokning> findAllByStädareIdAndBookingTimeLessThanEqualAndEndTimeGreaterThanEqual(
             Integer städareId, LocalDateTime bookingTime, LocalDateTime endTime);
+
+
 
 
 

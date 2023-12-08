@@ -23,5 +23,5 @@ public interface StädareRepository extends JpaRepository<Städare, Integer> {
                                         @Param("end") LocalDateTime end);
 
 
-
+    void delete(Städare städare);
 }

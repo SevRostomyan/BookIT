@@ -6,5 +6,7 @@ public enum BookingStatus {
     CONFIRMED,
     CANCELLED,
     COMPLETED,
-    UNDERKAND
+    UNDERKAND,
+    NOT_PAID,
+    PAID
 }
