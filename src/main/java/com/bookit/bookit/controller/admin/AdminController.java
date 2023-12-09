@@ -312,7 +312,7 @@ public class AdminController {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
             }
 
-            List<KundDTO> users = adminService.searchUsersByRole(query, role);
+            List<UserDTO> users = adminService.searchUsersByRole(query, role);
             return ResponseEntity.ok(users);
         } catch (SecurityException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
@@ -332,14 +332,30 @@ public class AdminController {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
             }
 
-            List<KundDTO> allKunder = adminService.getAllUsersByRole(UserRole.KUND);
+            List<UserDTO> allKunder = adminService.getAllUsersByRole(UserRole.KUND);
             return ResponseEntity.ok(allKunder);
         } catch (SecurityException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
         }
     }
 
+    @GetMapping("/städre/all")
+    public ResponseEntity<?> getAllStädare(HttpServletRequest httpRequest) {
+        try {
+            String token = httpRequest.getHeader("Authorization").substring(7);
+            Integer adminUserId = jwtService.extractUserId(token);
 
+            // Verify if the user is an admin
+            if (!adminService.isAdmin(adminUserId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
+            }
+
+            List<UserDTO> allKunder = adminService.getAllUsersByRole(UserRole.STÄDARE);
+            return ResponseEntity.ok(allKunder);
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
+        }
+    }
     @PostMapping("/users/add")
     public ResponseEntity<?> addUser(@RequestBody RegisterRequest request, HttpServletRequest httpRequest) {
         try {
@@ -360,7 +376,7 @@ public class AdminController {
 
 
     // Endpoint to update user information
-    @PutMapping("/users/update")
+    @PatchMapping("/users/update")
     public ResponseEntity<?> updateUser(@RequestBody UserUpdateRequest updateRequest, HttpServletRequest httpRequest) {
         try {
             String token = httpRequest.getHeader("Authorization").substring(7); // Extract JWT token

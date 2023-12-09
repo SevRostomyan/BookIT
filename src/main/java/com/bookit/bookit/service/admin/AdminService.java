@@ -207,9 +207,9 @@ public class AdminService {
         return user.getRole().equals(UserRole.ADMIN);
     }
 
-    public List<KundDTO> searchUsersByRole(String query, UserRole role) {
+    public List<UserDTO> searchUsersByRole(String query, UserRole role) {
         List<UserEntity> users = userRepository.findByFirstnameContainingOrLastnameContainingOrEmailContainingAndRole(query, query, query, role);
-        return users.stream().map(bokningMapper::mapUserEntityToKundDTO).collect(Collectors.toList());
+        return users.stream().map(bokningMapper::mapUserEntityToUserDTO).collect(Collectors.toList());
     }
 
 
@@ -231,11 +231,11 @@ public class AdminService {
 
 
 
-//Fetch a list of all customers
-    public List<KundDTO> getAllUsersByRole(UserRole role) {
+//Fetch a list of all user by role
+    public List<UserDTO> getAllUsersByRole(UserRole role) {
         List<UserEntity> users = userRepository.findByRole(role);
         return users.stream()
-                .map(bokningMapper::mapUserEntityToKundDTO) // Use the mapper method
+                .map(bokningMapper::mapUserEntityToUserDTO) // Use the mapper method
                 .collect(Collectors.toList());
     }
 

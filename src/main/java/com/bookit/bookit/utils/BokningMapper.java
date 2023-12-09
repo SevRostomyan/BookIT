@@ -3,6 +3,7 @@ package com.bookit.bookit.utils;
 import com.bookit.bookit.dto.BokningDTO;
 import com.bookit.bookit.dto.KundDTO;
 import com.bookit.bookit.dto.StädareDTO;
+import com.bookit.bookit.dto.UserDTO;
 import com.bookit.bookit.entity.bokning.Bokning;
 import com.bookit.bookit.entity.kund.Kund;
 import com.bookit.bookit.entity.städare.Städare;
@@ -42,12 +43,14 @@ public class BokningMapper {
     }
 
 
-    public KundDTO mapUserEntityToKundDTO(UserEntity user) {
-        KundDTO dto = new KundDTO();
+
+    public UserDTO mapUserEntityToUserDTO(UserEntity user) {
+        UserDTO dto = new UserDTO();
         dto.setId(user.getId());
         dto.setFirstname(user.getFirstname());
         dto.setLastname(user.getLastname());
         dto.setEmail(user.getEmail());
+        dto.setRole(user.getRole());
         return dto;
     }
 
