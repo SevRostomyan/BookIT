@@ -41,7 +41,9 @@ public class FakturaService {
 
 // Other necessary autowired repositories...
 
-    public List<Faktura> generateInvoices(Integer kundId) {
+
+
+    public void generateInvoices(Integer kundId) {
         // Fetch customer and completed bookings
         Kund kund = kundRepository.findById(kundId).orElseThrow(() -> new RuntimeException("Kund not found"));
         List<Bokning> completedBookings = bokningRepository.findAllByKundIdAndBookingStatus(kundId, BookingStatus.COMPLETED);
@@ -88,9 +90,9 @@ public class FakturaService {
             // Prepare and send invoice email
             prepareAndSendInvoiceEmail(faktura);
         }
-        return generatedInvoices;
     }
 
+    //Hjälpmetoder till generateInvoice metoden:
     private LocalDate getNearestWorkingDay(LocalDate date) {
         // Assuming weekends are non-working days. Adjust as per your locale's holidays.
         while (date.getDayOfWeek() == DayOfWeek.SATURDAY || date.getDayOfWeek() == DayOfWeek.SUNDAY) {
@@ -124,7 +126,6 @@ public class FakturaService {
                 // Add more details as needed
                 "\nTack för att du använder vår tjänst.";
     }
-
 
     private File generateInvoicePdf(Faktura faktura) {
         try {
@@ -172,6 +173,14 @@ public class FakturaService {
             return null; // Handle exception appropriately
         }
     }
+
+
+    //Metod för att hämta det genererade fakturan till frånenden:
+
+    public List<Faktura> getInvoicesForCustomer(Integer kundId) {
+        return fakturaRepository.findAllByKundId(kundId);
+    }
+
 
 
 }

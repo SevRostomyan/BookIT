@@ -483,12 +483,32 @@ public class AdminController {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
             }
 
-            List<Faktura> generatedInvoices = fakturaService.generateInvoices(request.getKundId());
-            return ResponseEntity.ok(generatedInvoices);
+            fakturaService.generateInvoices(request.getKundId());
+            return ResponseEntity.ok("Invoices generated and sent successfully.");
         } catch (SecurityException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
         }
     }
+
+
+    @PostMapping("/invoices")
+    public ResponseEntity<?> getInvoicesForCustomer(@RequestBody GenerateInvoiceRequest request, HttpServletRequest httpRequest) {
+        try {
+            String token = httpRequest.getHeader("Authorization").substring(7);
+            Integer adminUserId = jwtService.extractUserId(token);
+
+            // Verify if the user is an admin
+            if (!adminService.isAdmin(adminUserId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
+            }
+
+            List<Faktura> invoices = fakturaService.getInvoicesForCustomer(request.getKundId());
+            return ResponseEntity.ok(invoices);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving invoices.");
+        }
+    }
+
 }
 
 
