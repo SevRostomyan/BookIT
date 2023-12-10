@@ -49,6 +49,7 @@ public class AdminService {
     private final AdminRepository adminRepository;
 
 
+
     public List<BokningDTO> getBookingsForUserByAdmin(Integer targetUserId) {
         UserEntity targetUser = userRepository.findById(targetUserId)
                 .orElseThrow(() -> new EntityNotFoundException("Target user not found"));
@@ -272,19 +273,27 @@ public class AdminService {
         userRepository.save(user);
 
         // Prepare and send registration email
-        prepareAndSendRegistrationEmail(user);
+        // Retrieve the password from the request and pass it to the email method
+        String userPassword = request.getPassword();
+        prepareAndSendRegistrationEmail(user, userPassword);
 
         var jwtToken = jwtService.generateToken(user);
         return AuthenticationResponse.builder()
-                .token(jwtToken)
                 .build();
     }
 
     // This method should be outside the transactional context
-    private void prepareAndSendRegistrationEmail(UserEntity user) {
+    private void prepareAndSendRegistrationEmail(UserEntity user, String rawPassword) {
         String email = user.getEmail();
-        String subject = "Welcome to Our Service";
-        String body = "Dear " + user.getFirstname() + ",\n\nWelcome to our service. Your account has been successfully created.";
+        String subject = "Välkommen som kund till vår tjänst! ";
+        String loginUrl = "http://localhost:3000/login";
+        String body = "Hej " + user.getFirstname() + ",\n\n" +
+                "Välkommen till vår tjänst. Ditt konto har skapats.\n\n" +
+                "Här är dina inloggningsuppgifter:\n" +
+                "E-post: " + user.getEmail() + "\n" +
+                "Lösenord: " + rawPassword + "\n\n" + // Note: Sending raw password might not be secure
+                "Du kan logga in och ändra dina inloggningsuppgifter här: " + loginUrl; //todo: behöver skapa en frontend
+                // ...komponent där kund eller städarvarianten av nedan UpdateUser metod ska användas för att uppdatera inlogg uppgifterna
 
         // Send the email
         notificationsService.sendRegistrationEmail(email, subject, body, user);
@@ -309,7 +318,7 @@ public class AdminService {
             user.setEmail(updateRequest.getEmail());
         }
         if (updateRequest.getPassword() != null) {
-            user.setPassword(updateRequest.getPassword());
+            user.setPassword(passwordEncoder.encode(updateRequest.getPassword()));
         }
             // Other fields as needed
 
