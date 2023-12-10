@@ -1,11 +1,14 @@
 package com.bookit.bookit.entity.faktura;
 
 import com.bookit.bookit.entity.bokning.Bokning;
+import com.bookit.bookit.entity.notifications.Notifications;
+import com.bookit.bookit.entity.tjänst.Tjänst;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
@@ -16,10 +19,31 @@ public class Faktura {
     @Id
     @GeneratedValue
     private Integer id;
+
+    @OneToOne(mappedBy = "faktura")
+    private Notifications notification;
+
     private String fakturanummer;
-    private Double totaltBelopp;
-    private String förfallodatum;
 
     @ManyToOne
     private Bokning bokning;
+
+    @ManyToOne
+    private Tjänst tjänst;
+
+    private Double totaltBelopp;
+    private Double priceExclVAT;
+    private LocalDate invoiceDate;
+    private String förfallodatum;
+
+
+    // Company details
+    private String companyName;
+    private String organisationalNumber;
+    private String companyAddress;
+
+    // Customer details
+    private String customerFirstName;
+    private String customerLastName;
+    private String customerEmail;
 }

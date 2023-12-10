@@ -1,6 +1,7 @@
 package com.bookit.bookit.entity.notifications;
 
 import com.bookit.bookit.entity.bokning.Bokning;
+import com.bookit.bookit.entity.faktura.Faktura;
 import com.bookit.bookit.entity.user.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -23,6 +24,10 @@ public class Notifications {
 
     @ManyToOne
     private Bokning bokning;
+
+    @OneToOne
+    @JoinColumn(name = "id")
+    private Faktura faktura;
 
     @ManyToOne
     private UserEntity user;
