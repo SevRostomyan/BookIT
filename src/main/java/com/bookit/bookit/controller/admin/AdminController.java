@@ -3,9 +3,11 @@ package com.bookit.bookit.controller.admin;
 
 import com.bookit.bookit.config.JwtService;
 import com.bookit.bookit.dto.*;
+import com.bookit.bookit.entity.faktura.Faktura;
 import com.bookit.bookit.entity.user.UserEntity;
 import com.bookit.bookit.enums.UserRole;
 import com.bookit.bookit.repository.user.UserRepository;
+import com.bookit.bookit.service.faktura.FakturaService;
 import com.bookit.bookit.service.kund.KundService;
 import com.bookit.bookit.service.städare.StädareService;
 import jakarta.persistence.EntityNotFoundException;
@@ -44,15 +46,17 @@ public class AdminController {
     private final AdminService bokningService;
     private final UserRepository userRepository;
     private final KundService kundService;
+    private final FakturaService fakturaService;
 
     @Autowired
-    public AdminController(AdminService adminService, JwtService jwtService, StädareService städareService, AdminService bokningService, UserRepository userRepository, KundService kundService) {
+    public AdminController(AdminService adminService, JwtService jwtService, StädareService städareService, AdminService bokningService, UserRepository userRepository, KundService kundService, FakturaService fakturaService) {
         this.adminService = adminService;
         this.jwtService = jwtService;
         this.städareService = städareService;
         this.bokningService = bokningService;
         this.userRepository = userRepository;
         this.kundService = kundService;
+        this.fakturaService = fakturaService;
     }
 
 
@@ -468,8 +472,27 @@ public class AdminController {
     }
 
 
+    @PostMapping("/generateInvoices")
+    public ResponseEntity<?> generateInvoices(@RequestBody GenerateInvoiceRequest request, HttpServletRequest httpRequest) {
+        try {
+            String token = httpRequest.getHeader("Authorization").substring(7);
+            Integer adminUserId = jwtService.extractUserId(token);
 
+            // Verify if the user is an admin
+            if (!adminService.isAdmin(adminUserId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
+            }
 
-
-
+            List<Faktura> generatedInvoices = fakturaService.generateInvoices(request.getKundId());
+            return ResponseEntity.ok(generatedInvoices);
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
+        }
+    }
 }
+
+
+
+
+
+

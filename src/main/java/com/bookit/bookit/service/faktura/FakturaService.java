@@ -28,13 +28,13 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class FakturaService {
-    private static Font headerFont = new Font(Font.FontFamily.TIMES_ROMAN, 18, Font.BOLD);
-    private static Font normalFont = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.NORMAL);
+    private static final Font headerFont = new Font(Font.FontFamily.TIMES_ROMAN, 18, Font.BOLD);
+    private static final Font normalFont = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.NORMAL);
 
 
 
-    private BokningRepository bokningRepository;
-    private KundRepository kundRepository;
+    private final BokningRepository bokningRepository;
+    private final KundRepository kundRepository;
     private final FakturaRepository fakturaRepository;
     private final NotificationsService notificationsService;
     private final Environment env;
