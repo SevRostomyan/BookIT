@@ -14,7 +14,6 @@ import com.itextpdf.text.Font;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
 import lombok.AllArgsConstructor;
-import org.antlr.v4.runtime.misc.LogManager;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +21,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -52,20 +50,17 @@ public class FakturaService {
             throw new RuntimeException("No completed bookings available for invoice generation");
         }
 
-        List<Faktura> generatedInvoices = new ArrayList<>();
 
         for (Bokning booking : completedBookings) {
             String serviceType = booking.getTjänst().getStädningsAlternativ().toString();
-            double pricePerService = Double.parseDouble(env.getProperty(serviceType));
-
-            double priceExclVAT = pricePerService;
-            double priceInkVAT = priceExclVAT * 1.25; // Including VAT
+            double pricePerServiceExclVAT = Double.parseDouble(env.getProperty(serviceType));
+            double priceInkVAT = pricePerServiceExclVAT * 1.25; // Including VAT
 
             Faktura faktura = new Faktura();
             faktura.setBokning(booking);
             faktura.setTjänst(booking.getTjänst());
             faktura.setTotaltBelopp(priceInkVAT);
-            faktura.setPriceExclVAT(priceExclVAT);
+            faktura.setPriceExclVAT(pricePerServiceExclVAT);
             faktura.setInvoiceDate(getNearestWorkingDay(LocalDate.now()));
 
 
@@ -78,17 +73,27 @@ public class FakturaService {
             faktura.setCustomerLastName(kund.getLastname());
             faktura.setCustomerEmail(kund.getEmail());
 
-            // Update booking status to NOT_PAID
-            booking.setBookingStatus(BookingStatus.NOT_PAID);
-            bokningRepository.save(booking);
+            // Generate PDF and get file object
+            File invoicePdfFile  = generateInvoicePdf(faktura);
+            // Check if the PDF was successfully generated
+            if (invoicePdfFile != null) {
+                // Store the file path in the Faktura entity
+                faktura.setInvoiceFilePath(invoicePdfFile.getAbsolutePath());
+            } else {
+                // Handle the case where PDF generation failed
+                // For example, you might want to log this and continue with the next booking
+                continue;
+            }
 
-            // Save the invoice to the database if needed
+            // Save the invoice to the database with the file path
             fakturaRepository.save(faktura);
-
-            generatedInvoices.add(faktura);
 
             // Prepare and send invoice email
             prepareAndSendInvoiceEmail(faktura);
+
+            // Update booking status to NOT_PAID
+            booking.setBookingStatus(BookingStatus.NOT_PAID);
+            bokningRepository.save(booking);
         }
     }
 
@@ -128,9 +133,13 @@ public class FakturaService {
     }
 
     private File generateInvoicePdf(Faktura faktura) {
+        String directoryPath = "C:/Users/Vahe/Desktop/Java-Development - Ec utbildning/Kurs - Mjukvaruprojekt och webutveckling/BookItIInvoices";
+        String fileName = "Invoice_" + faktura.getId() + ".pdf";
+        String filePath = directoryPath + "/" + fileName;
+
         try {
             Document document = new Document();
-            PdfWriter.getInstance(document, new FileOutputStream("invoice.pdf"));
+            PdfWriter.getInstance(document, new FileOutputStream(filePath));
             document.open();
 
             // Invoice header
@@ -167,7 +176,7 @@ public class FakturaService {
             document.add(new Paragraph("---------------------------------------------------------", normalFont));
 
             document.close();
-            return new File("invoice.pdf");
+            return new File (filePath);
         } catch (Exception e) {
             e.printStackTrace();
             return null; // Handle exception appropriately
@@ -175,8 +184,8 @@ public class FakturaService {
     }
 
 
-    //Metod för att hämta det genererade fakturan till frånenden:
-
+    //Metod för att hämta de genererade fakturaobjekten till frontenden i form av en tabell. Tabellen ska innehålla även sökväg till
+    // PDF filen som man kan ladda ner via downloadInvoice endpointen i FakturaController. Kan användas av både Admin och kund:
     public List<Faktura> getInvoicesForCustomer(Integer kundId) {
         return fakturaRepository.findAllByKundId(kundId);
     }

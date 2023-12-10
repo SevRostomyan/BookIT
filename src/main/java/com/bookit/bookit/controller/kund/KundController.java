@@ -1,11 +1,12 @@
 package com.bookit.bookit.controller.kund;
 
 import com.bookit.bookit.config.JwtService;
-import com.bookit.bookit.controller.bokning.BokningController;
 import com.bookit.bookit.dto.CleaningStatusRequest;
 import com.bookit.bookit.dto.FeedbackRequest;
+import com.bookit.bookit.entity.faktura.Faktura;
 import com.bookit.bookit.enums.BookingStatus;
 import com.bookit.bookit.service.bokning.BokningService;
+import com.bookit.bookit.service.faktura.FakturaService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,17 +14,21 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/kund")
 public class KundController {
     private static final Logger logger = LoggerFactory.getLogger(KundController.class);
 
     private final BokningService bokningService;
-    private JwtService jwtService;
+    private final JwtService jwtService;
+    private final FakturaService fakturaService;
 
-    public KundController(BokningService bokningService, JwtService jwtService) {
+    public KundController(BokningService bokningService, JwtService jwtService, FakturaService fakturaService) {
         this.bokningService = bokningService;
         this.jwtService = jwtService;
+        this.fakturaService = fakturaService;
     }
 
 
@@ -77,5 +82,21 @@ public class KundController {
     }
 
 
+    @PostMapping("/customer/invoices")
+    public ResponseEntity<?> getCustomerInvoices(HttpServletRequest httpRequest) {
+        try {
+            String token = httpRequest.getHeader("Authorization").substring(7);
+            Integer customerId = jwtService.extractUserId(token);
+
+            // Fetch invoices for the logged-in customer
+            List<Faktura> invoices = fakturaService.getInvoicesForCustomer(customerId);
+            return ResponseEntity.ok(invoices);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving invoices.");
+        }
+    }
+
+    //The above method can be used together with the downloadInvoice endpoint from the FakturaController for fetching
+    // the InvoiceId and downloading the PDF file that is stored on the local machine
 
 }

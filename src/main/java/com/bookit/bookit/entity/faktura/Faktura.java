@@ -1,6 +1,7 @@
 package com.bookit.bookit.entity.faktura;
 
 import com.bookit.bookit.entity.bokning.Bokning;
+import com.bookit.bookit.entity.kund.Kund;
 import com.bookit.bookit.entity.notifications.Notifications;
 import com.bookit.bookit.entity.tjänst.Tjänst;
 import jakarta.persistence.*;
@@ -25,6 +26,9 @@ public class Faktura {
     private Notifications notification;
 
     private String fakturanummer;
+
+    @ManyToOne
+    private Kund kund;
 
     @ManyToOne
     private Bokning bokning;

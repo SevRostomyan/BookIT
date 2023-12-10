@@ -1,11 +1,11 @@
 package com.bookit.bookit.controller.admin;
 
-
 import com.bookit.bookit.config.JwtService;
 import com.bookit.bookit.dto.*;
 import com.bookit.bookit.entity.faktura.Faktura;
 import com.bookit.bookit.entity.user.UserEntity;
 import com.bookit.bookit.enums.UserRole;
+import com.bookit.bookit.repository.faktura.FakturaRepository;
 import com.bookit.bookit.repository.user.UserRepository;
 import com.bookit.bookit.service.faktura.FakturaService;
 import com.bookit.bookit.service.kund.KundService;
@@ -24,6 +24,8 @@ import com.bookit.bookit.service.admin.AdminService;
 import org.springframework.http.HttpStatus;
 //import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+
 import java.time.LocalDateTime;
 import com.bookit.bookit.exception.UserNotFoundException;
 
@@ -47,9 +49,10 @@ public class AdminController {
     private final UserRepository userRepository;
     private final KundService kundService;
     private final FakturaService fakturaService;
+    private final FakturaRepository fakturaRepository;
 
     @Autowired
-    public AdminController(AdminService adminService, JwtService jwtService, StädareService städareService, AdminService bokningService, UserRepository userRepository, KundService kundService, FakturaService fakturaService) {
+    public AdminController(AdminService adminService, JwtService jwtService, StädareService städareService, AdminService bokningService, UserRepository userRepository, KundService kundService, FakturaService fakturaService, FakturaRepository fakturaRepository) {
         this.adminService = adminService;
         this.jwtService = jwtService;
         this.städareService = städareService;
@@ -57,6 +60,7 @@ public class AdminController {
         this.userRepository = userRepository;
         this.kundService = kundService;
         this.fakturaService = fakturaService;
+        this.fakturaRepository = fakturaRepository;
     }
 
 
@@ -491,6 +495,7 @@ public class AdminController {
     }
 
 
+    //Metod för att hämta de genererade fakturaobjekten till frontenden i form av en tabell. Tabellen ska innehålla även sökväg till
     @PostMapping("/invoices")
     public ResponseEntity<?> getInvoicesForCustomer(@RequestBody GenerateInvoiceRequest request, HttpServletRequest httpRequest) {
         try {
@@ -508,6 +513,10 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving invoices.");
         }
     }
+
+ //Endpoint for downloading customer invoices are located in the Faktura Controller
+
+
 
 }
 
