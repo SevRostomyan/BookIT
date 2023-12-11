@@ -14,7 +14,9 @@ import com.itextpdf.text.Font;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
 import lombok.AllArgsConstructor;
+
 import org.springframework.core.env.Environment;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -22,14 +24,12 @@ import java.io.FileOutputStream;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @AllArgsConstructor
+@EnableJpaRepositories("com.bookit.bookit.repository.faktura")
 public class FakturaService {
-    private static final Font headerFont = new Font(Font.FontFamily.TIMES_ROMAN, 18, Font.BOLD);
-    private static final Font normalFont = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.NORMAL);
-
-
 
     private final BokningRepository bokningRepository;
     private final KundRepository kundRepository;
@@ -37,11 +37,14 @@ public class FakturaService {
     private final NotificationsService notificationsService;
     private final Environment env;
 
+    private static final Font headerFont = new Font(Font.FontFamily.TIMES_ROMAN, 18, Font.BOLD);
+    private static final Font normalFont = new Font(Font.FontFamily.TIMES_ROMAN, 12, Font.NORMAL);
+
 // Other necessary autowired repositories...
 
 
 
-    public void generateInvoices(Integer kundId) {
+   public void generateInvoices(Integer kundId) {
         // Fetch customer and completed bookings
         Kund kund = kundRepository.findById(kundId).orElseThrow(() -> new RuntimeException("Kund not found"));
         List<Bokning> completedBookings = bokningRepository.findAllByKundIdAndBookingStatus(kundId, BookingStatus.COMPLETED);
@@ -53,7 +56,7 @@ public class FakturaService {
 
         for (Bokning booking : completedBookings) {
             String serviceType = booking.getTjänst().getStädningsAlternativ().toString();
-            double pricePerServiceExclVAT = Double.parseDouble(env.getProperty(serviceType));
+            double pricePerServiceExclVAT = Double.parseDouble(Objects.requireNonNull(env.getProperty(serviceType)));
             double priceInkVAT = pricePerServiceExclVAT * 1.25; // Including VAT
 
             Faktura faktura = new Faktura();
@@ -186,7 +189,8 @@ public class FakturaService {
 
     //Metod för att hämta de genererade fakturaobjekten till frontenden i form av en tabell. Tabellen ska innehålla även sökväg till
     // PDF filen som man kan ladda ner via downloadInvoice endpointen i FakturaController. Kan användas av både Admin och kund:
-    public List<Faktura> getInvoicesForCustomer(Integer kundId) {
+
+      public List<Faktura> getInvoicesForCustomer(Integer kundId) {
         return fakturaRepository.findAllByKundId(kundId);
     }
 

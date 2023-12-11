@@ -47,20 +47,16 @@ public class AdminController {
     private final StädareService städareService;
     private final AdminService bokningService;
     private final UserRepository userRepository;
-    private final KundService kundService;
     private final FakturaService fakturaService;
-    private final FakturaRepository fakturaRepository;
 
     @Autowired
-    public AdminController(AdminService adminService, JwtService jwtService, StädareService städareService, AdminService bokningService, UserRepository userRepository, KundService kundService, FakturaService fakturaService, FakturaRepository fakturaRepository) {
+    public AdminController(AdminService adminService, JwtService jwtService, StädareService städareService, AdminService bokningService, UserRepository userRepository, FakturaService fakturaService) {
         this.adminService = adminService;
         this.jwtService = jwtService;
         this.städareService = städareService;
         this.bokningService = bokningService;
         this.userRepository = userRepository;
-        this.kundService = kundService;
         this.fakturaService = fakturaService;
-        this.fakturaRepository = fakturaRepository;
     }
 
 
