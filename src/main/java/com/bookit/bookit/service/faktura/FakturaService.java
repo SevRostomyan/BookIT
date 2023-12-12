@@ -4,10 +4,13 @@ import com.bookit.bookit.entity.bokning.Bokning;
 import com.bookit.bookit.entity.faktura.Faktura;
 import com.bookit.bookit.entity.kund.Kund;
 import com.bookit.bookit.enums.BookingStatus;
+import com.bookit.bookit.enums.StädningsAlternativ;
 import com.bookit.bookit.repository.bokning.BokningRepository;
 import com.bookit.bookit.repository.faktura.FakturaRepository;
 import com.bookit.bookit.repository.kund.KundRepository;
 import com.bookit.bookit.service.notifications.NotificationsService;
+import com.bookit.bookit.utils.CleaningServiceUtils;
+
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
@@ -55,16 +58,26 @@ public class FakturaService {
 
 
         for (Bokning booking : completedBookings) {
-            String serviceType = booking.getTjänst().getStädningsAlternativ().toString();
+            StädningsAlternativ alternativ = booking.getTjänst().getStädningsAlternativ();
+            String serviceType = CleaningServiceUtils.getServiceTypeKey(alternativ);
+
             double pricePerServiceExclVAT = Double.parseDouble(Objects.requireNonNull(env.getProperty(serviceType)));
             double priceInkVAT = pricePerServiceExclVAT * 1.25; // Including VAT
 
             Faktura faktura = new Faktura();
+            faktura.setKund(booking.getKund());
             faktura.setBokning(booking);
             faktura.setTjänst(booking.getTjänst());
             faktura.setTotaltBelopp(priceInkVAT);
             faktura.setPriceExclVAT(pricePerServiceExclVAT);
             faktura.setInvoiceDate(getNearestWorkingDay(LocalDate.now()));
+            faktura.setFakturanummer(getNextInvoiceNumber());
+
+
+            // Calculate förfallodatum
+            LocalDate invoiceDate = getNearestWorkingDay(LocalDate.now());
+            LocalDate förfallodatum = invoiceDate.plusDays(30); // 30 days payment term
+            faktura.setFörfallodatum(förfallodatum.toString());
 
 
             // Set company and customer details
@@ -75,6 +88,7 @@ public class FakturaService {
             faktura.setCustomerFirstName(kund.getFirstname());
             faktura.setCustomerLastName(kund.getLastname());
             faktura.setCustomerEmail(kund.getEmail());
+
 
             // Generate PDF and get file object
             File invoicePdfFile  = generateInvoicePdf(faktura);
@@ -109,8 +123,19 @@ public class FakturaService {
         return date;
     }
 
-    //Method to Prepare and Send Invoice Email
+    public synchronized String getNextInvoiceNumber() {
+        // Fetch the last fakturanummer and increment it
+        Faktura lastFaktura = fakturaRepository.findTopByOrderByFakturanummerDesc();
+        long nextNumber = 1; // Start from 1 if no invoices are present
+        if (lastFaktura != null) {
+            String lastNumber = lastFaktura.getFakturanummer();
+            nextNumber = Long.parseLong(lastNumber) + 1;
+        }
+        return String.format("%06d", nextNumber); // Formats the number with leading zeros
+    }
 
+
+    //Method to Prepare and Send Invoice Email
     private void prepareAndSendInvoiceEmail(Faktura faktura) {
         String email = faktura.getCustomerEmail();
         String subject = "Din faktura från StädaFint AB";

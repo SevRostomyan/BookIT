@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface FakturaRepository extends JpaRepository<Faktura, Integer> {
     List<Faktura> findAllByKundId(Integer kundId);
+
+    Faktura findTopByOrderByFakturanummerDesc();
 }
