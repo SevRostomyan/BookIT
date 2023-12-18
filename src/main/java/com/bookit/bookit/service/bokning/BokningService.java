@@ -1,7 +1,6 @@
 package com.bookit.bookit.service.bokning;
 
 import com.bookit.bookit.dto.BokningDTO;
-import com.bookit.bookit.entity.admin.Admin;
 import com.bookit.bookit.entity.bokning.Bokning;
 import com.bookit.bookit.entity.user.UserEntity;
 import com.bookit.bookit.enums.BookingStatus;

@@ -41,7 +41,7 @@ public class Bokning {
 
     private String messageAtBooking;
 
-    private String CustomerFeedback;
+    private String customerFeedback;
 
     @Enumerated(EnumType.STRING)
     private BookingStatus bookingStatus;

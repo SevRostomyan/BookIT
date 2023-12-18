@@ -22,13 +22,16 @@ public class BokningMapper {
         if (bokning.getStädare() != null) {
             dto.setStädare(mapToStädareDTO(bokning.getStädare()));
         }
-
+        dto.setTjänst(bokning.getTjänst());
         dto.setBookingTime(bokning.getBookingTime());
+        dto.setEndTime(bokning.getEndTime() != null ? bokning.getEndTime() : null);
         dto.setAdress(bokning.getAdress());
         dto.setMessageAtBooking(bokning.getMessageAtBooking());
-        dto.setCustomerFeedback(bokning.getCustomerFeedback());
+        dto.setCleaningReportedTime(bokning.getCleaningReportedTime() != null ? bokning.getCleaningReportedTime() : null);
+        dto.setCustomerFeedback(bokning.getCustomerFeedback() != null ? bokning.getCustomerFeedback() : null);
         dto.setStatus(bokning.getBookingStatus());
         dto.setCleaningReportStatus(bokning.getCleaningReportStatus());
+
         return dto;
     }
 
