@@ -46,6 +46,8 @@ public class BokningService {
         return null;
     }*/
 
+    //Kunden eller städaren kan använda nedan metod för att hämta aktuella bokningar kopplade till deras id.
+    // Admin har en annan method för att hämta bådas data
     public List<BokningDTO> getBookingsByUserId(Integer userId) {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
@@ -57,7 +59,10 @@ public class BokningService {
             List<BookingStatus> desiredStatusesForKund = Arrays.asList(
                     BookingStatus.PENDING,
                     BookingStatus.CONFIRMED,
-                    BookingStatus.CANCELLED);
+                    BookingStatus.CANCELLED,
+                    BookingStatus.UNDERKAND,
+                    BookingStatus.NOT_PAID
+                    );
             bookings = bookings.stream()
                     .filter(b -> desiredStatusesForKund.contains(b.getBookingStatus()))
                     .collect(Collectors.toList());

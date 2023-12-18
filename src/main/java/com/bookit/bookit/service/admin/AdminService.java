@@ -384,6 +384,8 @@ public class AdminService {
         adminRepository.delete(admin);
     }
 
+
+    //Används i metoder för att ta bort en kund eller städare om det finns inga aktiva bokningar
     private boolean hasActiveBookings(Kund kund) {
         // Find bookings by user
         List<Bokning> bookings = bokningRepository.findAllByKundId(kund.getId());
@@ -401,7 +403,7 @@ public class AdminService {
 
 
     private boolean isBookingActive(Bokning booking) {
-        // A booking is considered active if it is either cancelled or paid
+        // A booking is considered active if it is neither cancelled nor paid
         return booking.getBookingStatus() != BookingStatus.CANCELLED ||
                 booking.getBookingStatus() != BookingStatus.PAID;
     }

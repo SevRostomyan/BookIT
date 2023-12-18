@@ -17,6 +17,7 @@ import com.itextpdf.text.Font;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
 import lombok.AllArgsConstructor;
+import org.apache.log4j.Logger;
 
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -33,6 +34,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @EnableJpaRepositories("com.bookit.bookit.repository.faktura")
 public class FakturaService {
+    private static final Logger logger = Logger.getLogger(FakturaService.class);
 
     private final BokningRepository bokningRepository;
     private final KundRepository kundRepository;
@@ -90,16 +92,24 @@ public class FakturaService {
             faktura.setCustomerEmail(kund.getEmail());
 
 
-            // Generate PDF and get file object
-            File invoicePdfFile  = generateInvoicePdf(faktura);
-            // Check if the PDF was successfully generated
-            if (invoicePdfFile != null) {
-                // Store the file path in the Faktura entity
-                faktura.setInvoiceFilePath(invoicePdfFile.getAbsolutePath());
-            } else {
-                // Handle the case where PDF generation failed
-                // For example, you might want to log this and continue with the next booking
-                continue;
+            try {
+                // Generate PDF and get file object
+                File invoicePdfFile = generateInvoicePdf(faktura);
+
+                // Check if the PDF was successfully generated
+                if (invoicePdfFile != null) {
+                    // Store the file path in the Faktura entity
+                    faktura.setInvoiceFilePath(invoicePdfFile.getAbsolutePath());
+                } else {
+                    // Log the failure to generate PDF
+                    logger.error("PDF generation failed for booking ID: " + booking.getId());
+                    // You can add additional error handling or logging here if needed
+                }
+            } catch (Exception e) {
+                // Handle exceptions that may occur during PDF generation
+                // Log the exception details
+                logger.error("An error occurred during PDF generation for booking ID: " + booking.getId(), e);
+                // You can add additional error handling or logging here if needed
             }
 
             // Save the invoice to the database with the file path
