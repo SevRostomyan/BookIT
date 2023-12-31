@@ -327,7 +327,7 @@ public class AdminController {
         }
     }
 
-    @GetMapping("/städre/all")
+    @GetMapping("/städare/all")
     public ResponseEntity<?> getAllStädare(HttpServletRequest httpRequest) {
         try {
             String token = httpRequest.getHeader("Authorization").substring(7);

@@ -59,6 +59,7 @@ public class BokningService {
                     BookingStatus.PENDING,
                     BookingStatus.CONFIRMED,
                     BookingStatus.CANCELLED,
+                    BookingStatus.COMPLETED,
                     BookingStatus.UNDERKAND,
                     BookingStatus.NOT_PAID
                     );
@@ -88,6 +89,32 @@ public class BokningService {
                 .collect(Collectors.toList());
     }
 
+
+    //Kunden eller städaren kan använda nedan metod för att hämta samtliga bokningar kopplade till deras id - ink aktuella och avslutade.
+    // Admin har en annan method för att hämta bådas data
+    public List<BokningDTO> getAllBookingsByUserId(Integer userId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+        List<Bokning> bookings;
+
+        if (UserRole.KUND == user.getRole()) {
+            bookings = bokningRepository.findAllByKundId(userId);
+        } else if (UserRole.STÄDARE == user.getRole()) {
+            bookings = bokningRepository.findAllByStädareId(userId);
+        } else {
+            return Collections.emptyList();
+        }
+
+        if (bookings.isEmpty()) {
+            throw new EntityNotFoundException("No bookings found for the user");
+        }
+
+        // Convert to DTOs
+        return bookings.stream()
+                .map(bokningMapper::mapToDTO)
+                .collect(Collectors.toList());
+    }
 
 
 

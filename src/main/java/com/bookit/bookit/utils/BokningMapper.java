@@ -1,9 +1,6 @@
 package com.bookit.bookit.utils;
 
-import com.bookit.bookit.dto.BokningDTO;
-import com.bookit.bookit.dto.KundDTO;
-import com.bookit.bookit.dto.StädareDTO;
-import com.bookit.bookit.dto.UserDTO;
+import com.bookit.bookit.dto.*;
 import com.bookit.bookit.entity.bokning.Bokning;
 import com.bookit.bookit.entity.kund.Kund;
 import com.bookit.bookit.entity.städare.Städare;
@@ -16,13 +13,21 @@ public class BokningMapper {
     public BokningDTO mapToDTO(Bokning bokning) {
         BokningDTO dto = new BokningDTO();
         dto.setId(bokning.getId());
-        dto.setKund(mapToKundDTO(bokning.getKund()));
+
+    if (bokning.getKund() != null) {
+        BasicKundDTO kundDto = new BasicKundDTO();
+        kundDto.setId(bokning.getKund().getId());
+        kundDto.setFirstname(bokning.getKund().getFirstname());
+        kundDto.setLastname(bokning.getKund().getLastname());
+        kundDto.setEmail(bokning.getKund().getEmail());
+        dto.setKund(kundDto);
+    }
 
         // Check if Städare is not null before mapping
         if (bokning.getStädare() != null) {
             dto.setStädare(mapToStädareDTO(bokning.getStädare()));
         }
-        dto.setTjänst(bokning.getTjänst());
+        dto.setTjänst(bokning.getTjänst().getStädningsAlternativ());
         dto.setBookingTime(bokning.getBookingTime());
         dto.setEndTime(bokning.getEndTime() != null ? bokning.getEndTime() : null);
         dto.setAdress(bokning.getAdress());
@@ -77,7 +82,7 @@ public class BokningMapper {
         kund.setFirstname(kundDTO.getFirstname());
         kund.setLastname(kundDTO.getLastname());
         kund.setEmail(kundDTO.getEmail());
-        kund.setPassword(kund.getPassword());
+        //kund.setPassword(kund.getPassword());
         kund.setRole(kundDTO.getRole());
         return kund;
     }

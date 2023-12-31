@@ -48,8 +48,8 @@ public class BokningController {
         }
     }
 
-    //Kunden eller städaren kan använda nedan metod för att hämta aktuella bokningar kopplade till deras id.
-    // Admin har en annan method för att hämta bådas data
+    //Kunden eller städaren kan använda nedan metod för att hämta AKTUELLA (EJ BETALDA) bokningar kopplade till deras id.
+    //Admin har en annan method för att hämta bådas data
     //Endpointen tar in info via body och token via header
     @PostMapping("/fetchBookingsByUserId")
     public ResponseEntity<?> fetchBookingsByUserId(HttpServletRequest httpRequest) {
@@ -58,6 +58,22 @@ public class BokningController {
             Integer userId = jwtService.extractUserId(token);
 
             List<BokningDTO> bookings = bokningService.getBookingsByUserId(userId);
+            return ResponseEntity.ok(bookings);
+        } catch (SecurityException e) {
+            logger.warn("Unauthorized attempt to fetch bookings: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/getAllBookingsByUserId")
+    public ResponseEntity<?> getAllBookingsByUserId(HttpServletRequest httpRequest) {
+        try {
+            String token = httpRequest.getHeader("Authorization").substring(7); // Using Bearer token
+            Integer userId = jwtService.extractUserId(token);
+
+            List<BokningDTO> bookings = bokningService.getAllBookingsByUserId(userId);
             return ResponseEntity.ok(bookings);
         } catch (SecurityException e) {
             logger.warn("Unauthorized attempt to fetch bookings: " + e.getMessage());
@@ -129,7 +145,7 @@ public class BokningController {
 
 
     //Från kundens perspektiv
-    //Returnerar en lista med bokningar som kunden har markerat som avklarade. Kan anropas av bara KUND eller STÄDARE.
+    //Returnerar en lista med bokningar som kunden har markerat som avklarade (ej betalda än). Kan anropas av bara KUND eller STÄDARE.
     // Admin har en separat method för det i Admin controller och service
 
     @PostMapping("/fetchCompletedBookingsByUserId")
