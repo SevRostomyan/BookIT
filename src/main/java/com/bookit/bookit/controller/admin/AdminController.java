@@ -98,7 +98,7 @@ public class AdminController {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
             }
 
-            List<BokningDTO> notAssignedBookings = bokningService.getNotAssignedBookings();
+            List<BokningDTO> notAssignedBookings = adminService.getNotAssignedBookings();
             return ResponseEntity.ok(notAssignedBookings);
         } catch (SecurityException e) {
             logger.warn("Unauthorized attempt to fetch not assigned bookings: " + e.getMessage());
@@ -110,7 +110,7 @@ public class AdminController {
 
     //Denna ska anropas i samband med ovan metod för att kunna fetcha en lista med lediga städare under bokningens period och tilldela.
     // Se bild i kommentarerna i Jira under uppgift 61.
-    @GetMapping("/available-cleaners")
+    @PostMapping("/available-cleaners")
     public ResponseEntity<?> getAvailableCleaners(@RequestBody BookingTimeDTO bookingTimeDTO, HttpServletRequest httpRequest) {
 
         try {
