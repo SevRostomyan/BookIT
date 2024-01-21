@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AssignCleaningRequest {
     private Integer bookingId;
-    private Integer städareId;
+    private Integer cleanerId;
 }

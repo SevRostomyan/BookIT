@@ -139,7 +139,7 @@ public class AdminController {
             String token = httpRequest.getHeader("Authorization").substring(7); // Extract the token
             Integer userId = jwtService.extractUserId(token); // Extract userId from the token
 
-            String result = städareService.assignCleaning(request.getBookingId(), request.getStädareId(), userId);
+            String result = städareService.assignCleaning(request.getBookingId(), request.getCleanerId(), userId);
             if ("Success".equals(result)) {
                 return ResponseEntity.ok("Uppdraget är tilldelat!");
             } else {
