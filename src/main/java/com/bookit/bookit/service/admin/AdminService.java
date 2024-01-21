@@ -303,7 +303,7 @@ public class AdminService {
 
     //Metod för att uppdatera kundinformationen
     public void updateUser(UserUpdateRequest updateRequest) throws UserNotFoundException {
-        UserEntity user = userRepository.findById(updateRequest.getUserId())
+        UserEntity user = userRepository.findById(updateRequest.getId()) //id är userId
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         // Update details. Bellows it is included null handling in cas Admin wants to change only some of the fields and not others.
