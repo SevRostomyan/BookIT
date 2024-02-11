@@ -78,7 +78,7 @@ public class AdminService {
         List<Bokning> bookings = bokningRepository.findAllByCleaningReportStatus(CleaningReportStatus.NOT_ASSIGNED);
 
         if (bookings.isEmpty()) {
-            throw new EntityNotFoundException("No not assigned bookings found");
+            return Collections.emptyList();
         }
 
         // Convert to DTOs
