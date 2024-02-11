@@ -15,7 +15,6 @@ import com.bookit.bookit.repository.kund.KundRepository;
 import com.bookit.bookit.repository.städare.StädareRepository;
 import com.bookit.bookit.repository.tjänst.TjänstRepository;
 import com.bookit.bookit.repository.user.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,25 +34,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
                 "com.bookit.bookit.repository.tjänst"})
 @Configuration
 public class UserConfig {
-
-    private final UserRepository userRepository;
-    private final AdminRepository adminRepository;
-    private final KundRepository kundRepository;
-    private final BokningRepository bokningRepository;
-    private final StädareRepository städareRepository;
-    private final TjänstRepository tjänstRepository;
-
-    @Autowired
-    public UserConfig(UserRepository userRepository, AdminRepository adminRepository, KundRepository kundRepository, BokningRepository bokningRepository, StädareRepository städareRepository, TjänstRepository tjänstRepository) {
-
-        this.userRepository = userRepository;
-        this.adminRepository = adminRepository;
-        this.kundRepository = kundRepository;
-        this.bokningRepository = bokningRepository;
-        this.städareRepository = städareRepository;
-        this.tjänstRepository = tjänstRepository;
-    }
-
 
     @Bean
     CommandLineRunner initAdmin(UserRepository userRepository, PasswordEncoder passwordEncoder, AdminRepository adminRepository, KundRepository kundRepository, BokningRepository bokningRepository, TjänstRepository tjänstRepository, StädareRepository städareRepository) {
