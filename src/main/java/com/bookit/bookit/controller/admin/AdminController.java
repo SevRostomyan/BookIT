@@ -5,10 +5,8 @@ import com.bookit.bookit.dto.*;
 import com.bookit.bookit.entity.faktura.Faktura;
 import com.bookit.bookit.entity.user.UserEntity;
 import com.bookit.bookit.enums.UserRole;
-import com.bookit.bookit.repository.faktura.FakturaRepository;
 import com.bookit.bookit.repository.user.UserRepository;
 import com.bookit.bookit.service.faktura.FakturaService;
-import com.bookit.bookit.service.kund.KundService;
 import com.bookit.bookit.service.städare.StädareService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,11 +25,11 @@ import org.springframework.web.bind.annotation.*;
 
 
 import java.time.LocalDateTime;
+
 import com.bookit.bookit.exception.UserNotFoundException;
 
 import java.time.YearMonth;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -59,34 +57,6 @@ public class AdminController {
         this.fakturaService = fakturaService;
     }
 
-
-
-    //Behövs ej
-    @GetMapping("/dashboard")
-    //@PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> getAdminDashboard() {
-        Map<String, Object> response = new HashMap<>();
-        response.put("role", "ADMIN");
-
-      /*  // Fetch various metrics and data from services (this is just a skeleton)
-        Integer totalCustomers = customerService.getTotalCustomers();
-        Integer totalCleaners = cleanerService.getTotalCleaners();
-        List<Booking> upcomingBookings = bookingService.getUpcomingBookings();
-        List<String> systemAlerts = alertService.getUnresolvedAlerts();
-
-        // Add them to response
-        response.put("totalCustomers", totalCustomers);
-        response.put("totalCleaners", totalCleaners);
-        response.put("upcomingBookings", upcomingBookings);
-        response.put("systemAlerts", systemAlerts);
-        // ... and so on*/
-
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-
-
-
     @GetMapping("/fetchNotAssignedBookings")
     public ResponseEntity<?> fetchNotAssignedBookings(HttpServletRequest httpRequest) {
         try {
@@ -94,7 +64,7 @@ public class AdminController {
             Integer adminUserId = jwtService.extractUserId(token);
 
             // Verify if the user is an admin
-            if (!adminService.isAdmin(adminUserId)) {
+            if (adminService.isAdmin(adminUserId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
             }
 
@@ -155,10 +125,6 @@ public class AdminController {
     }
 
 
-
-
-
-
     //Används av Admin för att fetcha samtliga bokningar åt en kund eller städare
     //inklusive aktiva och avslutade bokningar.
 
@@ -169,7 +135,7 @@ public class AdminController {
             Integer adminUserId = jwtService.extractUserId(token);
 
             // Verify if the user is an admin
-            if (!adminService.isAdmin(adminUserId)) {
+            if (adminService.isAdmin(adminUserId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
             }
 
@@ -190,7 +156,7 @@ public class AdminController {
             Integer adminUserId = jwtService.extractUserId(token); // Extract admin user ID from the token
 
             // Verify if the user is an admin
-            if (!adminService.isAdmin(adminUserId)) {
+            if (adminService.isAdmin(adminUserId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
             }
 
@@ -213,7 +179,7 @@ public class AdminController {
             Integer adminUserId = jwtService.extractUserId(token); // Extract admin user ID from the token
 
             // Verify if the user is an admin
-            if (!adminService.isAdmin(adminUserId)) {
+            if (adminService.isAdmin(adminUserId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
             }
 
@@ -227,7 +193,6 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
         }
     }
-
 
 
     //Från kundens perspektiv (alltså det är bara kunden som använder BookingStatus enumet borträknad admin)
@@ -247,8 +212,6 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Collections.singletonList("Unauthorized access."));
         }
     }
-
-
 
 
     //Från städarens perspektiv (alltså det är bara städaren som använder CleaningReportStatus enumet borträknad admin)
@@ -296,7 +259,7 @@ public class AdminController {
             Integer adminUserId = jwtService.extractUserId(token);
 
             // Verify if the user is an admin
-            if (!adminService.isAdmin(adminUserId)) {
+            if (adminService.isAdmin(adminUserId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
             }
 
@@ -316,7 +279,7 @@ public class AdminController {
             Integer adminUserId = jwtService.extractUserId(token);
 
             // Verify if the user is an admin
-            if (!adminService.isAdmin(adminUserId)) {
+            if (adminService.isAdmin(adminUserId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
             }
 
@@ -334,7 +297,7 @@ public class AdminController {
             Integer adminUserId = jwtService.extractUserId(token);
 
             // Verify if the user is an admin
-            if (!adminService.isAdmin(adminUserId)) {
+            if (adminService.isAdmin(adminUserId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
             }
 
@@ -344,6 +307,7 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
         }
     }
+
     @PostMapping("/users/add")
     public ResponseEntity<?> addUser(@RequestBody RegisterRequest request, HttpServletRequest httpRequest) {
         try {
@@ -351,7 +315,7 @@ public class AdminController {
             Integer adminUserId = jwtService.extractUserId(token);
 
             // Verify if the user is an admin
-            if (!adminService.isAdmin(adminUserId)) {
+            if (adminService.isAdmin(adminUserId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
             }
 
@@ -370,7 +334,7 @@ public class AdminController {
             Integer adminUserId = jwtService.extractUserId(token);
 
             // Verify if the user is an admin
-            if (!adminService.isAdmin(adminUserId)) {
+            if (adminService.isAdmin(adminUserId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
             }
 
@@ -392,7 +356,7 @@ public class AdminController {
             String token = httpRequest.getHeader("Authorization").substring(7);
             Integer adminUserId = jwtService.extractUserId(token);
 
-            if (!adminService.isAdmin(adminUserId)) {
+            if (adminService.isAdmin(adminUserId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
             }
 
@@ -414,7 +378,7 @@ public class AdminController {
             String token = httpRequest.getHeader("Authorization").substring(7);
             Integer adminUserId = jwtService.extractUserId(token);
 
-            if (!adminService.isAdmin(adminUserId)) {
+            if (adminService.isAdmin(adminUserId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
             }
 
@@ -436,7 +400,7 @@ public class AdminController {
             String token = httpRequest.getHeader("Authorization").substring(7);
             Integer adminUserId = jwtService.extractUserId(token);
 
-            if (!adminService.isAdmin(adminUserId)) {
+            if (adminService.isAdmin(adminUserId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
             }
 
@@ -450,6 +414,7 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred.");
         }
     }
+
     @PostMapping("/calculateCleanerMonthlyIncome")
     public ResponseEntity<?> calculateCleanerMonthlyIncome(HttpServletRequest httpRequest, @RequestBody CleanerIncomeRequest request) {
         try {
@@ -479,7 +444,7 @@ public class AdminController {
             Integer adminUserId = jwtService.extractUserId(token);
 
             // Verify if the user is an admin
-            if (!adminService.isAdmin(adminUserId)) {
+            if (adminService.isAdmin(adminUserId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
             }
 
@@ -499,7 +464,7 @@ public class AdminController {
             Integer adminUserId = jwtService.extractUserId(token);
 
             // Verify if the user is an admin
-            if (!adminService.isAdmin(adminUserId)) {
+            if (adminService.isAdmin(adminUserId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
             }
 
@@ -510,8 +475,7 @@ public class AdminController {
         }
     }
 
- //Endpoint for downloading customer invoices are located in the Faktura Controller
-
+    //Endpoint for downloading customer invoices are located in the Faktura Controller
 
 
 }

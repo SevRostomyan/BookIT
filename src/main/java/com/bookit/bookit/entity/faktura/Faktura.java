@@ -19,7 +19,7 @@ public class Faktura {
     @Id
     @GeneratedValue
     private Integer id;
-    private String invoiceFilePath; // Path or URL to the invoice file   (Ej använt än. Behöver logik för att hämta filer)
+    private String invoiceFilePath; // Path or URL to the invoice file (Ej använt än. Behöver logik för att hämta filer)
 
     @OneToOne(mappedBy = "faktura")
     private Notifications notification;

@@ -25,19 +25,13 @@ public class TjänstService {
     // ... other prices
 
     public int getPriceForCleaningType(StädningsAlternativ type) {
-        switch (type) {
-            case BASIC:
-                return basicPrice;
-            case TOPP:
-                return toppPrice;
-            case DIAMANT:
-                return diamantPrice;
-            case FÖNSTERTVÄTT:
-                return fonstertvattPrice;
+        return switch (type) {
+            case BASIC -> basicPrice;
+            case TOPP -> toppPrice;
+            case DIAMANT -> diamantPrice;
+            case FÖNSTERTVÄTT -> fonstertvattPrice;
             // ... other cases
-            default:
-                throw new IllegalArgumentException("Unknown cleaning type: " + type);
-        }
+        };
     }
 }
 

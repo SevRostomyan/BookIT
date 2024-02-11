@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
 
 @Entity
 @Data
@@ -17,8 +16,7 @@ public class Betalning {
     @GeneratedValue
     private Integer id;
     private Double belopp;
-    private String betalningsmetod; // t.ex. kort, banköverföring, etc.
-
+    private String betalningsmetod; // t.ex. Kort, banköverföring, etc.
     @ManyToOne
     private Bokning bokning;
 }

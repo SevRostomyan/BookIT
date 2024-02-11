@@ -2,13 +2,10 @@ package com.bookit.bookit.config;
 
 import com.bookit.bookit.entity.user.UserEntity;
 import com.bookit.bookit.repository.user.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
 
 
 @Service

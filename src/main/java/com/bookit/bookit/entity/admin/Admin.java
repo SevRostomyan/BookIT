@@ -4,13 +4,13 @@ import com.bookit.bookit.entity.notifications.Notifications;
 import com.bookit.bookit.entity.user.UserEntity;
 import com.bookit.bookit.enums.UserRole;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.UUID;
+
 
 @Entity
 @Data

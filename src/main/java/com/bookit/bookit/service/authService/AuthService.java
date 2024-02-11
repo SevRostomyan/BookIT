@@ -32,28 +32,17 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
 
 
-
     public AuthenticationResponse register(RegisterRequest request) {
-        // Check if user already exists. If exists returnes 409 in the body when checking in Postman
+        // Check if user already exists. If exists return 409 in the body when checking in Postman
         if (repository.findUserByEmail(request.getEmail()).isPresent()) {
             throw new UserAlreadyExistsException("User with email " + request.getEmail() + " already exists");
         }
 
-        UserEntity user;
-        switch (request.getRole()) {
-            case KUND:
-                user = new Kund();
-                break;
-            case ADMIN:
-                user = new Admin();
-                break;
-            case STÄDARE:
-                user = new Städare();
-                break;
-            default:
-                user = new UserEntity();
-                break;
-        }
+        UserEntity user = switch (request.getRole()) {
+            case KUND -> new Kund();
+            case ADMIN -> new Admin();
+            case STÄDARE -> new Städare();
+        };
 
         user.setFirstname(request.getFirstname());
         user.setLastname(request.getLastname());
@@ -85,23 +74,20 @@ public class AuthService {
     // This method actually sends the email and should handle any exceptions internally
 
 
-
-
-
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
-       try {
-           authenticationManager.authenticate(
-                   new UsernamePasswordAuthenticationToken(
-                           request.getEmail(),
-                           request.getPassword()
-                   )
-                   //Att this point the username(the email) and password are correct..
-                   //So if both of them are correct I just need to check the role and if it is also correct generate a token
-                   // and send it back to the client
-           );
-       }catch (AuthenticationException e){
-           throw new BadCredentialsException("Invalid username/password");
-       }
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getEmail(),
+                            request.getPassword()
+                    )
+                    //Att this point the username(the email) and password are correct...
+                    //So if both of them are correct I just need to check the role and if it is also correct generate a token
+                    // and send it back to the client
+            );
+        } catch (AuthenticationException e) {
+            throw new BadCredentialsException("Invalid username/password");
+        }
         var user = repository.findUserByEmail(request.getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
@@ -112,7 +98,7 @@ public class AuthService {
                     .build();
         }
 
-       var jwtToken = jwtService.generateToken(user); //When I get the user I can use this user object to generate a token...
+        var jwtToken = jwtService.generateToken(user); //When I get the user I can use this user object to generate a token...
         return AuthenticationResponse.builder()
                 .token(jwtToken) //...and return this authentication response
                 .role(user.getRole().name())

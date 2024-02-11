@@ -32,7 +32,6 @@ public class KundController {
     }
 
 
-
     @PutMapping("/updateCleaningStatustoGodkand")
     public ResponseEntity<String> updateCleaningStatusToGodkand(@RequestBody CleaningStatusRequest request, HttpServletRequest httpRequest) {
         try {
@@ -48,8 +47,6 @@ public class KundController {
     }
 
 
-
-
     @PutMapping("/updateCleaningStatusToUnderkand")
     public ResponseEntity<String> updateCleaningStatusToUnderkand(@RequestBody CleaningStatusRequest request, HttpServletRequest httpRequest) {
         try {
@@ -63,8 +60,6 @@ public class KundController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
         }
     }
-
-
 
 
     @PostMapping("/saveCustomerFeedback")

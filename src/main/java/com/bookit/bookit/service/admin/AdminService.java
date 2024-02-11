@@ -21,11 +21,12 @@ import com.bookit.bookit.service.tjänst.TjänstService;
 import com.bookit.bookit.utils.BokningMapper;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
-import org.antlr.v4.runtime.misc.LogManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.bookit.bookit.exception.UserAlreadyExistsException;
+
 import java.time.YearMonth;
+
 import com.bookit.bookit.exception.UserNotFoundException;
 
 import java.util.Collections;
@@ -47,7 +48,6 @@ public class AdminService {
     private final JwtService jwtService;
     private final StädareRepository städareRepository;
     private final AdminRepository adminRepository;
-
 
 
     public List<BokningDTO> getBookingsForUserByAdmin(Integer targetUserId) {
@@ -136,7 +136,6 @@ public class AdminService {
     }
 
 
-
     //Från kundens perspektiv (alltså det är bara kunden som använder BookingStatus enumet borträknad admin)
     public List<BokningDTO> fetchCompletedBookingsForUserByAdmin(Integer targetUserId, Integer adminUserId) {
         UserEntity admin = userRepository.findById(adminUserId)
@@ -164,7 +163,6 @@ public class AdminService {
                 .map(bokningMapper::mapToDTO)
                 .collect(Collectors.toList());
     }
-
 
 
     //Från städarens perspektiv (alltså det är bara städaren som använder CleaningReportStatus enumet borträknad admin)
@@ -205,7 +203,7 @@ public class AdminService {
     public boolean isAdmin(Integer userId) {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
-        return user.getRole().equals(UserRole.ADMIN);
+        return !user.getRole().equals(UserRole.ADMIN);
     }
 
     public List<UserDTO> searchUsersByRole(String query, UserRole role) {
@@ -214,10 +212,8 @@ public class AdminService {
     }
 
 
-
-
     public Map<YearMonth, Integer> calculateCleanerMonthlyIncome(Integer cleanerId) {
-        List<Bokning> completedBookings = fetchCompletedBookingsForCleaner(cleanerId, BookingStatus.COMPLETED);
+        List<Bokning> completedBookings = fetchCompletedBookingsForCleaner(cleanerId);
         return completedBookings.stream()
                 .collect(Collectors.groupingBy(
                         booking -> YearMonth.from(booking.getBookingTime()),
@@ -225,14 +221,13 @@ public class AdminService {
                 ));
     }
 
-    private List<Bokning> fetchCompletedBookingsForCleaner(Integer cleanerId, BookingStatus status) {
+    private List<Bokning> fetchCompletedBookingsForCleaner(Integer cleanerId) {
         // Fetch bookings for the specified cleaner
-        return bokningRepository.findAllByStädareIdAndBookingStatus(cleanerId, status);
+        return bokningRepository.findAllByStädareIdAndBookingStatus(cleanerId, BookingStatus.COMPLETED);
     }
 
 
-
-//Fetch a list of all user by role
+    //Fetch a list of all user by role
     public List<UserDTO> getAllUsersByRole(UserRole role) {
         List<UserEntity> users = userRepository.findByRole(role);
         return users.stream()
@@ -248,21 +243,12 @@ public class AdminService {
             throw new UserAlreadyExistsException("User with email " + request.getEmail() + " already exists");
         }
 
-        UserEntity user;
-        switch (request.getRole()) {
-            case KUND:
-                user = new Kund();
-                break;
-            case ADMIN:
-                user = new Admin();
-                break;
-            case STÄDARE:
-                user = new Städare();
-                break;
-            default:
-                user = new UserEntity();
-                break;
-        }
+        UserEntity user = switch (request.getRole()) {
+            case KUND -> new Kund();
+            case ADMIN -> new Admin();
+            case STÄDARE -> new Städare();
+            default -> new UserEntity();
+        };
 
         user.setFirstname(request.getFirstname());
         user.setLastname(request.getLastname());
@@ -277,7 +263,7 @@ public class AdminService {
         String userPassword = request.getPassword();
         prepareAndSendRegistrationEmail(user, userPassword);
 
-        var jwtToken = jwtService.generateToken(user);
+        jwtService.generateToken(user);
         return AuthenticationResponse.builder()
                 .build();
     }
@@ -286,6 +272,14 @@ public class AdminService {
     private void prepareAndSendRegistrationEmail(UserEntity user, String rawPassword) {
         String email = user.getEmail();
         String subject = "Välkommen som kund till vår tjänst! ";
+        String body = getString(user, rawPassword);
+        // ...komponent där kund eller städarvarianten av nedan UpdateUser metod ska användas för att uppdatera inlogg uppgifterna
+
+        // Send the email
+        notificationsService.sendRegistrationEmail(email, subject, body, user);
+    }
+
+    private static String getString(UserEntity user, String rawPassword) {
         String loginUrl = "http://localhost:3000/login";
         String body = "Hej " + user.getFirstname() + ",\n\n" +
                 "Välkommen till vår tjänst. Ditt konto har skapats.\n\n" +
@@ -293,12 +287,8 @@ public class AdminService {
                 "E-post: " + user.getEmail() + "\n" +
                 "Lösenord: " + rawPassword + "\n\n" + // Note: Sending raw password might not be secure
                 "Du kan logga in och ändra dina inloggningsuppgifter här: " + loginUrl; //todo: behöver skapa en frontend
-                // ...komponent där kund eller städarvarianten av nedan UpdateUser metod ska användas för att uppdatera inlogg uppgifterna
-
-        // Send the email
-        notificationsService.sendRegistrationEmail(email, subject, body, user);
+        return body;
     }
-
 
 
     //Metod för att uppdatera kundinformationen
@@ -320,10 +310,10 @@ public class AdminService {
         if (updateRequest.getPassword() != null) {
             user.setPassword(passwordEncoder.encode(updateRequest.getPassword()));
         }
-            // Other fields as needed
+        // Other fields as needed
 
-            userRepository.save(user);
-        }
+        userRepository.save(user);
+    }
 
 
     //Metod för att ta bort en kund
@@ -350,7 +340,6 @@ public class AdminService {
     }
 
 
-
     //Delete STÄDARE
     public void deleteStädare(UserDeleteRequest deleteRequest) throws UserNotFoundException, IllegalStateException {
         Integer städareId = deleteRequest.getUserId();
@@ -373,7 +362,6 @@ public class AdminService {
         // Delete the Städare
         städareRepository.delete(städare);
     }
-
 
 
     // Endpoint to delete an Admin

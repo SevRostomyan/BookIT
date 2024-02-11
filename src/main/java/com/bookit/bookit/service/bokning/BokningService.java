@@ -36,15 +36,6 @@ public class BokningService {
     private final TjänstService tjänstService;
 
 
-    //Behövs ej
-    /* public String getUserRoleById(Integer userId) {
-        Optional<UserEntity> userOptional = userRepository.findById(userId);
-        if (userOptional.isPresent()) {
-            return userOptional.get().getRole().name();
-        }
-        return null;
-    }*/
-
     //Kunden eller städaren kan använda nedan metod för att hämta aktuella bokningar kopplade till deras id.
     // Admin har en annan method för att hämta bådas data
     public List<BokningDTO> getBookingsByUserId(Integer userId) {
@@ -62,7 +53,7 @@ public class BokningService {
                     BookingStatus.COMPLETED,
                     BookingStatus.UNDERKAND,
                     BookingStatus.NOT_PAID
-                    );
+            );
             bookings = bookings.stream()
                     .filter(b -> desiredStatusesForKund.contains(b.getBookingStatus()))
                     .collect(Collectors.toList());
@@ -117,8 +108,6 @@ public class BokningService {
     }
 
 
-
-
     //////Nedan två metoder arbetar ihop för att KUNDEN ska kunna markera städningen som godkänd eller underkänd och
     ///// det ska skickas mejl om arbetsstatus till både admin och städaren
     /*@Transactional
@@ -171,7 +160,6 @@ public class BokningService {
     }
 
 
-
     // Denna metod bör vara utanför den transaktionella kontexten
     //Den används till updateBookingStatus metoden ovan
     private void sendStatusUpdateEmails(Bokning booking, BookingStatus bookingStatus, CleaningReportStatus cleaningReportStatus) {
@@ -198,13 +186,7 @@ public class BokningService {
     }
 
 
-
 // Notera: User-parametern i sendEmail-metoden är nu en gemensam typ för både Admin och Städare.
-
-
-
-
-
 
 
     //////Nedan två metoder arbetar ihop för att städaren ska kunna informera kunden om att städningen är påbörjat
@@ -250,7 +232,6 @@ public class BokningService {
             // You could also implement a retry mechanism or queue the email for later retry
         }
     }
-
 
 
     //////Nedan två metoder arbetar ihop för att städare ska kunna informera kunden om att städningen är klar och kan granskas
@@ -318,7 +299,6 @@ public class BokningService {
     }
 
 
-
     public List<BokningDTO> fetchNotStartedBookingsByUserId(Integer userId) {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
@@ -381,7 +361,6 @@ public class BokningService {
     }
 
 
-
     //Returnerar en lista med bokningar som städaren har markerat som avklarade. Kan anropas av bara KUND eller STÄDARE.
     //Admin har en separat method för det i Admin controller och service
     public List<BokningDTO> fetchCompletedCleaningsByUserId(Integer userId) {
@@ -404,11 +383,8 @@ public class BokningService {
     }
 
 
-
-
-
     public Map<YearMonth, Integer> calculateMonthlyIncomeFromCompletedBookings(Integer userId) {
-        List<Bokning> completedBookings = fetchCompletedBookings(userId, BookingStatus.COMPLETED);
+        List<Bokning> completedBookings = fetchCompletedBookings(userId);
 
         return completedBookings.stream()
                 .collect(Collectors.groupingBy(
@@ -417,20 +393,17 @@ public class BokningService {
                 ));
     }
 
-    private List<Bokning> fetchCompletedBookings(Integer userId, BookingStatus status) {
+    private List<Bokning> fetchCompletedBookings(Integer userId) {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
         if (user.getRole().equals(UserRole.KUND)) {
-            return bokningRepository.findAllByKundIdAndBookingStatus(userId, status);
+            return bokningRepository.findAllByKundIdAndBookingStatus(userId, BookingStatus.COMPLETED);
         } else if (user.getRole().equals(UserRole.STÄDARE)) {
-            return bokningRepository.findAllByStädareIdAndBookingStatus(userId, status);
+            return bokningRepository.findAllByStädareIdAndBookingStatus(userId, BookingStatus.COMPLETED);
         } else {
             throw new SecurityException("Unauthorized access to fetch bookings.");
         }
     }
-
-
-
 
 
 }

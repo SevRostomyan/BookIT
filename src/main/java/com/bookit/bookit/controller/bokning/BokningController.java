@@ -4,7 +4,7 @@ import com.bookit.bookit.config.JwtService;
 import com.bookit.bookit.dto.BokningDTO;
 import com.bookit.bookit.dto.BookingIdRequest;
 import com.bookit.bookit.dto.CleaningBookingRequest;
-import com.bookit.bookit.dto.UserIdRequest;
+
 import com.bookit.bookit.enums.BookingStatus;
 import com.bookit.bookit.service.bokning.BokningService;
 import com.bookit.bookit.service.kund.KundService;
@@ -170,8 +170,6 @@ public class BokningController {
     }
 
 
-
-
     //Från städarens perspektiv (alltså det är bara städaren som använder CleaningReportStatus enumet borträknad admin)
     @PostMapping("/fetchReportedCompletedBookingsByUserId")
     public ResponseEntity<?> fetchReportedCompletedBookingsByUserId(HttpServletRequest httpRequest) {
@@ -194,8 +192,7 @@ public class BokningController {
     }
 
 
-
-   //Infon ska visas som en tabell i Städarens Dashboard
+    //Infon ska visas som en tabell i Städarens Dashboard
     @PostMapping("/calculateMonthlyIncome")
     public ResponseEntity<?> calculateMonthlyIncome(HttpServletRequest httpRequest) {
         try {

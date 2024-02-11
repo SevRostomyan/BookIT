@@ -2,7 +2,6 @@ package com.bookit.bookit.utils;
 
 import com.bookit.bookit.dto.*;
 import com.bookit.bookit.entity.bokning.Bokning;
-import com.bookit.bookit.entity.kund.Kund;
 import com.bookit.bookit.entity.städare.Städare;
 import com.bookit.bookit.entity.user.UserEntity;
 import org.springframework.stereotype.Component;
@@ -14,14 +13,14 @@ public class BokningMapper {
         BokningDTO dto = new BokningDTO();
         dto.setId(bokning.getId());
 
-    if (bokning.getKund() != null) {
-        BasicKundDTO kundDto = new BasicKundDTO();
-        kundDto.setId(bokning.getKund().getId());
-        kundDto.setFirstname(bokning.getKund().getFirstname());
-        kundDto.setLastname(bokning.getKund().getLastname());
-        kundDto.setEmail(bokning.getKund().getEmail());
-        dto.setKund(kundDto);
-    }
+        if (bokning.getKund() != null) {
+            BasicKundDTO kundDto = new BasicKundDTO();
+            kundDto.setId(bokning.getKund().getId());
+            kundDto.setFirstname(bokning.getKund().getFirstname());
+            kundDto.setLastname(bokning.getKund().getLastname());
+            kundDto.setEmail(bokning.getKund().getEmail());
+            dto.setKund(kundDto);
+        }
 
         // Check if Städare is not null before mapping
         if (bokning.getStädare() != null) {
@@ -51,7 +50,6 @@ public class BokningMapper {
     }
 
 
-
     public UserDTO mapUserEntityToUserDTO(UserEntity user) {
         UserDTO dto = new UserDTO();
         dto.setId(user.getId());
@@ -62,29 +60,5 @@ public class BokningMapper {
         return dto;
     }
 
-
-    //Mappar kundEntity till KundDTO
-    public KundDTO mapToKundDTO(Kund kund) {
-        KundDTO dto = new KundDTO();
-        dto.setId(kund.getId());
-        dto.setFirstname(kund.getFirstname());
-        dto.setLastname(kund.getLastname());
-        dto.setEmail(kund.getEmail());
-        dto.setPassword(kund.getPassword());
-        dto.setRole(kund.getRole());
-        return dto;
-    }
-
-    //Mappar KundDTO till KundEntity
-    public Kund mapToKund(KundDTO kundDTO) {
-        Kund kund = new Kund();
-        kund.setId(kundDTO.getId());
-        kund.setFirstname(kundDTO.getFirstname());
-        kund.setLastname(kundDTO.getLastname());
-        kund.setEmail(kundDTO.getEmail());
-        //kund.setPassword(kund.getPassword());
-        kund.setRole(kundDTO.getRole());
-        return kund;
-    }
 
 }

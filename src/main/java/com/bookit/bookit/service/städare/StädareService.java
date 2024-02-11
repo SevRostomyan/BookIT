@@ -56,8 +56,6 @@ public class StädareService {
     }
 
 
-
-
     //////Nedan tre metoder arbetar ihop för att tilldela städning till städare och informera städaren via mejl
 
     // StädareService.java
@@ -137,11 +135,6 @@ public class StädareService {
             // You could also implement a retry mechanism or queue the email for later retry
         }
     }
-
-
-
-
-
 
 
 }

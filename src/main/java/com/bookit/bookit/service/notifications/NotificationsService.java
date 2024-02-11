@@ -4,7 +4,6 @@ import com.bookit.bookit.entity.bokning.Bokning;
 import com.bookit.bookit.entity.faktura.Faktura;
 import com.bookit.bookit.entity.notifications.Notifications;
 import com.bookit.bookit.entity.user.UserEntity;
-import com.bookit.bookit.entity.kund.Kund;
 
 
 import com.bookit.bookit.enums.StädningsAlternativ;
@@ -19,7 +18,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
 
 import java.io.File;
 import java.time.LocalDateTime;
@@ -77,8 +76,6 @@ public class NotificationsService {
             // Additional error handling
         }
     }
-
-
 
 
     //Ska raderas

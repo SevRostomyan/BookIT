@@ -22,7 +22,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 
-
 @RestController
 @RequestMapping("/api/admin")
 public class FakturaController {
@@ -48,7 +47,7 @@ public class FakturaController {
             Faktura faktura = fakturaRepository.findById(invoiceIdRequest.getInvoiceId())
                     .orElseThrow(() -> new RuntimeException("Invoice not found"));
 
-            if (!adminService.isAdmin(userId) && !faktura.getKund().getId().equals(userId)) {
+            if (adminService.isAdmin(userId) && !faktura.getKund().getId().equals(userId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
             }
 

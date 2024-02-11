@@ -32,7 +32,6 @@ public interface BokningRepository extends JpaRepository<Bokning, Integer> {
 
     List<Bokning> findAllByStädareId(Integer städareId);
 
-
     @Modifying
     @Query("UPDATE Bokning b SET b.bookingStatus = :status WHERE b.id = :id")
     void updateBookingStatus(@Param("id") Integer id, @Param("status") BookingStatus status);
@@ -48,7 +47,6 @@ public interface BokningRepository extends JpaRepository<Bokning, Integer> {
     // If you need to find by cleaningReportStatus, add methods for that as well
     List<Bokning> findAllByKundIdAndCleaningReportStatus(Integer kundId, CleaningReportStatus cleaningReportStatus);
     List<Bokning> findAllByStädareIdAndCleaningReportStatus(Integer städareId, CleaningReportStatus cleaningReportStatus);
-
     Optional<Bokning> findById(Integer id);
 
     List<Bokning> findAllByStädareIdAndBookingTimeLessThanEqualAndEndTimeGreaterThanEqual(

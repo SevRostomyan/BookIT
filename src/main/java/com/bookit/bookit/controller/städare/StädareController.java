@@ -1,7 +1,6 @@
 package com.bookit.bookit.controller.städare;
 
 import com.bookit.bookit.config.JwtService;
-import com.bookit.bookit.controller.bokning.BokningController;
 import com.bookit.bookit.dto.CleaningStatusRequest;
 import com.bookit.bookit.service.bokning.BokningService;
 import jakarta.persistence.EntityNotFoundException;
@@ -72,7 +71,6 @@ public class StädareController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ett internt fel inträffade när städningen rapporterades som genomförd.");
         }
     }
-
 
 
 }

@@ -48,8 +48,7 @@ public class FakturaService {
 // Other necessary autowired repositories...
 
 
-
-   public void generateInvoices(Integer kundId) {
+    public void generateInvoices(Integer kundId) {
         // Fetch customer and completed bookings
         Kund kund = kundRepository.findById(kundId).orElseThrow(() -> new RuntimeException("Kund not found"));
         List<Bokning> completedBookings = bokningRepository.findAllByKundIdAndBookingStatus(kundId, BookingStatus.COMPLETED);
@@ -164,7 +163,7 @@ public class FakturaService {
                 "Här är din faktura för den städtjänst som tillhandahållits.\n" +
                 "Fakturanummer: " + faktura.getId() + "\n" +
                 "Totalbelopp (exkl. moms): " + faktura.getPriceExclVAT() + " kr\n" +
-                "Totalbelopp (inkl. moms): " + faktura.getTotaltBelopp() + " kr\n"+
+                "Totalbelopp (inkl. moms): " + faktura.getTotaltBelopp() + " kr\n" +
 
                 // Add more details as needed
                 "\nTack för att du använder vår tjänst.";
@@ -214,7 +213,7 @@ public class FakturaService {
             document.add(new Paragraph("---------------------------------------------------------", normalFont));
 
             document.close();
-            return new File (filePath);
+            return new File(filePath);
         } catch (Exception e) {
             e.printStackTrace();
             return null; // Handle exception appropriately
@@ -225,10 +224,9 @@ public class FakturaService {
     //Metod för att hämta de genererade fakturaobjekten till frontenden i form av en tabell. Tabellen ska innehålla även sökväg till
     // PDF filen som man kan ladda ner via downloadInvoice endpointen i FakturaController. Kan användas av både Admin och kund:
 
-      public List<Faktura> getInvoicesForCustomer(Integer kundId) {
+    public List<Faktura> getInvoicesForCustomer(Integer kundId) {
         return fakturaRepository.findAllByKundId(kundId);
     }
-
 
 
 }

@@ -1,29 +1,28 @@
 package com.bookit.bookit.service.kund;
+
 import com.bookit.bookit.dto.CleaningBookingRequest;
-import com.bookit.bookit.dto.KundDTO;
+
 import com.bookit.bookit.entity.bokning.Bokning;
 import com.bookit.bookit.entity.kund.Kund;
 import com.bookit.bookit.entity.tjänst.Tjänst;
-import com.bookit.bookit.entity.user.UserEntity;
+
 import com.bookit.bookit.enums.BookingStatus;
 import com.bookit.bookit.enums.CleaningReportStatus;
-import com.bookit.bookit.enums.UserRole;
+
 import com.bookit.bookit.repository.bokning.BokningRepository;
 import com.bookit.bookit.repository.kund.KundRepository;
 import com.bookit.bookit.repository.tjänst.TjänstRepository;
-import com.bookit.bookit.repository.user.UserRepository;
+
 import com.bookit.bookit.service.notifications.NotificationsService;
-import com.bookit.bookit.utils.BokningMapper;
+
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -90,11 +89,11 @@ public class KundService {
                 + "\nAddress: " + booking.getAdress();
 
         // Send the booking confirmation email
-        sendBookingConfirmationEmail(email, subject, body,kund, booking);
+        sendBookingConfirmationEmail(email, subject, body, kund, booking);
     }
 
     // This method actually sends the email and should handle any exceptions internally
-    private void sendBookingConfirmationEmail(String email, String subject, String body,Kund kund, Bokning booking) {
+    private void sendBookingConfirmationEmail(String email, String subject, String body, Kund kund, Bokning booking) {
         try {
             notificationsService.sendEmail(email, subject, body, booking.getTjänst().getStädningsAlternativ(), kund, booking);
         } catch (Exception e) {
@@ -103,9 +102,6 @@ public class KundService {
             // You could also implement a retry mechanism or queue the email for later retry
         }
     }
-
-
-
 
 
 }

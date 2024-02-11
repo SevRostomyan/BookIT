@@ -22,10 +22,6 @@ public class Kund extends UserEntity {
     @OneToMany(mappedBy = "kund", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonBackReference
     private List<Bokning> bokningar;
-
-/*
-    @OneToOne(cascade = CascadeType.ALL)
-    private User user; //Kopplat till User klassen för inloggningssyfte
-*/
+    //Kopplad till Bokning klassen för att kunna se bokningar kopplade till kunden
 
 }
