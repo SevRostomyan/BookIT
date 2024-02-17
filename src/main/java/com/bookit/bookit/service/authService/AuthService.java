@@ -16,10 +16,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +31,7 @@ public class AuthService {
     private final NotificationsService notificationsService;
 
     private final AuthenticationManager authenticationManager;
-
+    private final UserDetailsService userDetailsService;
 
     public AuthenticationResponse register(RegisterRequest request) {
         // Check if user already exists. If exists return 409 in the body when checking in Postman
@@ -104,4 +105,17 @@ public class AuthService {
                 .role(user.getRole().name())
                 .build();
     }
+
+    public AuthenticationResponse refreshToken(String token) {
+        String username = jwtService.extractUsername(token);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+        if (jwtService.isTokenValid(token, userDetails)) {
+            String newToken = jwtService.generateToken(userDetails);
+            return new AuthenticationResponse(newToken, userDetails.getAuthorities().toString(), null);
+        } else {
+            throw new IllegalArgumentException("Invalid or Expired Token");
+        }
+    }
+
 }

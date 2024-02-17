@@ -27,7 +27,7 @@ public class BokningController {
 
     private final KundService kundService;
     private final BokningService bokningService;
-    private JwtService jwtService;
+    private final JwtService jwtService;
 
     public BokningController(KundService kundService, BokningService bokningService, JwtService jwtService) {
         this.kundService = kundService;
