@@ -77,16 +77,23 @@ public class KundController {
     }
 
 
-    @PostMapping("/customer/invoices")
+    @PostMapping("/invoices")
     public ResponseEntity<?> getCustomerInvoices(HttpServletRequest httpRequest) {
+        Logger logger = LoggerFactory.getLogger(KundController.class);
         try {
             String token = httpRequest.getHeader("Authorization").substring(7);
+            logger.info("Received token: {}", token);
+
             Integer customerId = jwtService.extractUserId(token);
+            logger.info("Extracted customer ID from token: {}", customerId);
 
             // Fetch invoices for the logged-in customer
             List<Faktura> invoices = fakturaService.getInvoicesForCustomer(customerId);
+            logger.info("Fetched {} invoices for customer ID {}", invoices.size(), customerId);
+
             return ResponseEntity.ok(invoices);
         } catch (Exception e) {
+            logger.error("Error retrieving invoices: ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving invoices.");
         }
     }

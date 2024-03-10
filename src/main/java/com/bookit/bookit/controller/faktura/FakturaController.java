@@ -23,7 +23,7 @@ import java.nio.file.Paths;
 
 
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("/api/invoices")
 public class FakturaController {
 
     private final FakturaRepository fakturaRepository;
@@ -37,8 +37,8 @@ public class FakturaController {
     }
 
 
-    // PDF filen som man kan ladda ner via downloadInvoice endpointen i FakturaController. Kan användas av både Admin och kund:
-    @PostMapping("/invoices/download")
+    // PDF filen som man kan ladda ner via downloadInvoice endpointen i FakturaController. Kan användas av både Admin och Kund
+    @PostMapping("/download")
     public ResponseEntity<?> downloadInvoice(@RequestBody InvoiceIdRequest invoiceIdRequest, HttpServletRequest httpRequest) {
         try {
             String token = httpRequest.getHeader("Authorization").substring(7);
@@ -47,7 +47,8 @@ public class FakturaController {
             Faktura faktura = fakturaRepository.findById(invoiceIdRequest.getInvoiceId())
                     .orElseThrow(() -> new RuntimeException("Invoice not found"));
 
-            if (adminService.isAdmin(userId) && !faktura.getKund().getId().equals(userId)) {
+            // Tillåt nedladdning om användaren är admin eller om fakturan tillhör användaren
+            if (!adminService.isAdmin(userId) && !faktura.getKund().getId().equals(userId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
             }
 
@@ -71,4 +72,5 @@ public class FakturaController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error downloading invoice.");
         }
     }
+
 }
