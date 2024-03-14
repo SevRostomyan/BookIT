@@ -5,6 +5,7 @@ import com.bookit.bookit.dto.BokningDTO;
 import com.bookit.bookit.dto.BookingIdRequest;
 import com.bookit.bookit.dto.CleaningBookingRequest;
 
+import com.bookit.bookit.entity.bokning.Bokning;
 import com.bookit.bookit.enums.BookingStatus;
 import com.bookit.bookit.service.bokning.BokningService;
 import com.bookit.bookit.service.kund.KundService;
@@ -206,6 +207,5 @@ public class BokningController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
         }
     }
-
 
 }

@@ -393,7 +393,7 @@ public class BokningService {
                 ));
     }
 
-    private List<Bokning> fetchCompletedBookings(Integer userId) {
+    public List<Bokning> fetchCompletedBookings(Integer userId) {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
         if (user.getRole().equals(UserRole.KUND)) {
@@ -404,7 +404,6 @@ public class BokningService {
             throw new SecurityException("Unauthorized access to fetch bookings.");
         }
     }
-
 
 }
 

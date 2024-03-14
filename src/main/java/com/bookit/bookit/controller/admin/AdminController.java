@@ -2,6 +2,7 @@ package com.bookit.bookit.controller.admin;
 
 import com.bookit.bookit.config.JwtService;
 import com.bookit.bookit.dto.*;
+import com.bookit.bookit.entity.bokning.Bokning;
 import com.bookit.bookit.entity.faktura.Faktura;
 import com.bookit.bookit.entity.user.UserEntity;
 import com.bookit.bookit.enums.UserRole;
@@ -171,7 +172,7 @@ public class AdminController {
         }
     }
 
-
+    //Används av Admin
     @PostMapping("/fetchInProgressBookingsForUser")
     public ResponseEntity<?> fetchInProgressBookingsForUserByAdmin(@RequestBody UserIdRequest request, HttpServletRequest httpRequest) {
         try {
@@ -202,7 +203,7 @@ public class AdminController {
             String token = httpRequest.getHeader("Authorization").substring(7); // Extract the token
             Integer adminUserId = jwtService.extractUserId(token); // Extract admin user ID from the token
 
-            List<BokningDTO> completedBookings = bokningService.fetchCompletedBookingsForUserByAdmin(request.getTargetUserId(), adminUserId);
+            List<BokningDTO> completedBookings = adminService.fetchCompletedBookingsForUserByAdmin(request.getTargetUserId(), adminUserId);
             return ResponseEntity.ok(completedBookings);
         } catch (SecurityException e) {
             // Log the exception for internal monitoring
@@ -212,6 +213,66 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Collections.singletonList("Unauthorized access."));
         }
     }
+
+    @PostMapping("/fetchAllCompletedBookings")
+    public ResponseEntity<?> fetchAllCompletedBookings(HttpServletRequest httpRequest) {
+        try {
+            String token = httpRequest.getHeader("Authorization").substring(7); // Extract the token
+            Integer adminUserId = jwtService.extractUserId(token); // Extract admin user ID from the token
+
+            List<BokningDTO> completedBookings = adminService.fetchAllCompletedBookings(adminUserId);
+            return ResponseEntity.ok(completedBookings);
+        } catch (SecurityException e) {
+            // Log the exception for internal monitoring
+            logger.warn("Unauthorized attempt to fetch all completed bookings: " + e.getMessage());
+
+            // Return a 403 Forbidden response with an appropriate body
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Collections.singletonList("Unauthorized access."));
+        }
+    }
+
+    @PostMapping("/fetchNotPaidBookingsForUser")
+    public ResponseEntity<?> fetchNotPaidBookingsForUserByAdmin(@RequestBody UserIdRequest request, HttpServletRequest httpRequest) {
+        try {
+            String token = httpRequest.getHeader("Authorization").substring(7); // Extract the token
+            Integer adminUserId = jwtService.extractUserId(token); // Extract admin user ID from the token
+
+            // Verify if the user is an admin
+            if (adminService.isAdmin(adminUserId)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
+            }
+
+            List<Bokning> NotPaidBookings = adminService.fetchNotPaidBookingsByUserID(request.getUserId());
+            return ResponseEntity.ok(NotPaidBookings);
+        } catch (SecurityException e) {
+            // Log the exception for internal monitoring
+            logger.warn("Unauthorized attempt by admin to fetch unpaid bookings for user [" + request.getUserId() + "]: " + e.getMessage());
+
+            // Return a 403 Forbidden response with an appropriate body
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
+        }
+    }
+
+    @PostMapping("/fetchAllNotPaidBookings")
+    public ResponseEntity<?> fetchAllNotPaidBookings(HttpServletRequest httpRequest) {
+        try {
+            String token = httpRequest.getHeader("Authorization").substring(7);
+            Integer adminUserId = jwtService.extractUserId(token);
+
+            // Om användaren är admin, fortsätt med att hämta bokningarna
+            if (adminService.isAdmin(adminUserId)) {
+                List<BokningDTO> notPaidBookings = adminService.fetchAllNotPaidBookings();
+                return ResponseEntity.ok(notPaidBookings);
+            } else {
+                // Om användaren inte är admin, returnera ett felmeddelande
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
+            }
+        } catch (SecurityException e) {
+            logger.warn("Unauthorized attempt to fetch all unpaid bookings: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
+        }
+    }
+
 
 
     //Från städarens perspektiv (alltså det är bara städaren som använder CleaningReportStatus enumet borträknad admin)
