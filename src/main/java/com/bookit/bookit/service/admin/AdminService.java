@@ -164,6 +164,22 @@ public class AdminService {
                 .collect(Collectors.toList());
     }
 
+    public List<BokningDTO> fetchAllCompletedBookings(Integer adminUserId) {
+        UserEntity admin = userRepository.findById(adminUserId)
+                .orElseThrow(() -> new EntityNotFoundException("Admin user not found with id: " + adminUserId));
+
+        if (!admin.getRole().equals(UserRole.ADMIN)) {
+            throw new SecurityException("Unauthorized access. Only admins can fetch all completed bookings.");
+        }
+
+        List<Bokning> bookings = bokningRepository.findAllByCleaningReportStatus(CleaningReportStatus.REPORTED_COMPLETED_AND_READY_FOR_CUSTOMER_REVIEW);
+
+        // Convert to DTOs
+        return bookings.stream()
+                .map(bokningMapper::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
 
     //Från städarens perspektiv (alltså det är bara städaren som använder CleaningReportStatus enumet borträknad admin)
     public List<BokningDTO> fetchReportedCompletedBookingsForUserByAdmin(Integer targetUserId, Integer adminUserId) {
@@ -224,6 +240,25 @@ public class AdminService {
     private List<Bokning> fetchCompletedBookingsForCleaner(Integer cleanerId) {
         // Fetch bookings for the specified cleaner
         return bokningRepository.findAllByStädareIdAndBookingStatus(cleanerId, BookingStatus.COMPLETED);
+    }
+
+    public List<Bokning> fetchNotPaidBookingsByUserID(Integer userId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+        if (user.getRole().equals(UserRole.KUND)) {
+            return bokningRepository.findAllByKundIdAndBookingStatus(userId, BookingStatus.NOT_PAID);
+        } else {
+            throw new SecurityException("Unauthorized access to fetch bookings.");
+        }
+    }
+
+    public List<BokningDTO> fetchAllNotPaidBookings() {
+        List<Bokning> bookings = bokningRepository.findAllByBookingStatus(BookingStatus.NOT_PAID);
+
+        // Convert to DTOs
+        return bookings.stream()
+                .map(bokningMapper::mapToDTO)
+                .collect(Collectors.toList());
     }
 
 
@@ -395,5 +430,7 @@ public class AdminService {
         return booking.getBookingStatus() != BookingStatus.CANCELLED ||
                 booking.getBookingStatus() != BookingStatus.PAID;
     }
+
+
 }
 

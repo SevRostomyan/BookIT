@@ -53,7 +53,5 @@ public interface BokningRepository extends JpaRepository<Bokning, Integer> {
             Integer städareId, LocalDateTime bookingTime, LocalDateTime endTime);
 
 
-
-
-
+    List<Bokning> findAllByBookingStatus(BookingStatus bookingStatus);
 }
