@@ -3,6 +3,7 @@ package com.bookit.bookit.entity.user;
 import com.bookit.bookit.entity.admin.Admin;
 import com.bookit.bookit.entity.notifications.Notifications;
 import com.bookit.bookit.enums.UserRole;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -44,10 +45,13 @@ public class UserEntity implements UserDetails {
     private String password;
     @Enumerated(EnumType.STRING)
     private UserRole role;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<Notifications> notifications;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private Admin admin;
 
 

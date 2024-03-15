@@ -3,6 +3,8 @@ package com.bookit.bookit.entity.notifications;
 import com.bookit.bookit.entity.bokning.Bokning;
 import com.bookit.bookit.entity.faktura.Faktura;
 import com.bookit.bookit.entity.user.UserEntity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,13 +25,18 @@ public class Notifications {
     private String meddelande;
 
     @ManyToOne
+    @JoinColumn(name = "bokning_id")
+    @JsonBackReference
     private Bokning bokning;
 
     @OneToOne
-    @JoinColumn(name = "id")
+    @JoinColumn
+    @JsonBackReference
     private Faktura faktura;
 
     @ManyToOne
+    @JoinColumn(name = "user_id")
+    @JsonBackReference
     private UserEntity user;
 
     private String subject; // Subject of the notification

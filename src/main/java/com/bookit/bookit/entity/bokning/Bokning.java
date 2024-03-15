@@ -5,6 +5,7 @@ import com.bookit.bookit.entity.städare.Städare;
 import com.bookit.bookit.entity.tjänst.Tjänst;
 import com.bookit.bookit.enums.BookingStatus;
 import com.bookit.bookit.enums.CleaningReportStatus;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -24,13 +25,18 @@ public class Bokning {
     private Integer id;
 
     @ManyToOne
-    @JsonManagedReference
+    @JoinColumn(name = "kund_id")
+    @JsonBackReference
     private Kund kund;
 
     @ManyToOne
+    @JoinColumn(name = "städare_id")
+    @JsonBackReference
     private Städare städare;
 
     @ManyToOne
+    @JoinColumn(name = "tjänst_id")
+    @JsonBackReference
     private Tjänst tjänst;
 
     private LocalDateTime bookingTime;

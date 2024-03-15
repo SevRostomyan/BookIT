@@ -219,7 +219,7 @@ public class AdminService {
     public boolean isAdmin(Integer userId) {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
-        return !user.getRole().equals(UserRole.ADMIN);
+        return user.getRole().equals(UserRole.ADMIN);
     }
 
     public List<UserDTO> searchUsersByRole(String query, UserRole role) {

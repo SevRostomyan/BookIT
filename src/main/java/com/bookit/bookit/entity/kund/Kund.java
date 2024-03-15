@@ -2,7 +2,7 @@ package com.bookit.bookit.entity.kund;
 import com.bookit.bookit.entity.bokning.Bokning;
 
 import com.bookit.bookit.entity.user.UserEntity;
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -20,7 +20,7 @@ public class Kund extends UserEntity {
 
 
     @OneToMany(mappedBy = "kund", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonBackReference
+    @JsonManagedReference
     private List<Bokning> bokningar;
     //Kopplad till Bokning klassen för att kunna se bokningar kopplade till kunden
 

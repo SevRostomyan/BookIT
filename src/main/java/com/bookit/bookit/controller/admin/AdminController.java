@@ -65,7 +65,7 @@ public class AdminController {
             Integer adminUserId = jwtService.extractUserId(token);
 
             // Verify if the user is an admin
-            if (adminService.isAdmin(adminUserId)) {
+            if (!adminService.isAdmin(adminUserId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
             }
 
@@ -136,7 +136,7 @@ public class AdminController {
             Integer adminUserId = jwtService.extractUserId(token);
 
             // Verify if the user is an admin
-            if (adminService.isAdmin(adminUserId)) {
+            if (!adminService.isAdmin(adminUserId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
             }
 
@@ -157,7 +157,7 @@ public class AdminController {
             Integer adminUserId = jwtService.extractUserId(token); // Extract admin user ID from the token
 
             // Verify if the user is an admin
-            if (adminService.isAdmin(adminUserId)) {
+            if (!adminService.isAdmin(adminUserId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
             }
 
@@ -180,7 +180,7 @@ public class AdminController {
             Integer adminUserId = jwtService.extractUserId(token); // Extract admin user ID from the token
 
             // Verify if the user is an admin
-            if (adminService.isAdmin(adminUserId)) {
+            if (!adminService.isAdmin(adminUserId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
             }
 
@@ -238,7 +238,7 @@ public class AdminController {
             Integer adminUserId = jwtService.extractUserId(token); // Extract admin user ID from the token
 
             // Verify if the user is an admin
-            if (adminService.isAdmin(adminUserId)) {
+            if (!adminService.isAdmin(adminUserId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
             }
 
@@ -320,7 +320,7 @@ public class AdminController {
             Integer adminUserId = jwtService.extractUserId(token);
 
             // Verify if the user is an admin
-            if (adminService.isAdmin(adminUserId)) {
+            if (!adminService.isAdmin(adminUserId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
             }
 
@@ -340,7 +340,7 @@ public class AdminController {
             Integer adminUserId = jwtService.extractUserId(token);
 
             // Verify if the user is an admin
-            if (adminService.isAdmin(adminUserId)) {
+            if (!adminService.isAdmin(adminUserId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
             }
 
@@ -358,7 +358,7 @@ public class AdminController {
             Integer adminUserId = jwtService.extractUserId(token);
 
             // Verify if the user is an admin
-            if (adminService.isAdmin(adminUserId)) {
+            if (!adminService.isAdmin(adminUserId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
             }
 
@@ -376,7 +376,7 @@ public class AdminController {
             Integer adminUserId = jwtService.extractUserId(token);
 
             // Verify if the user is an admin
-            if (adminService.isAdmin(adminUserId)) {
+            if (!adminService.isAdmin(adminUserId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
             }
 
@@ -395,7 +395,7 @@ public class AdminController {
             Integer adminUserId = jwtService.extractUserId(token);
 
             // Verify if the user is an admin
-            if (adminService.isAdmin(adminUserId)) {
+            if (!adminService.isAdmin(adminUserId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
             }
 
@@ -417,7 +417,7 @@ public class AdminController {
             String token = httpRequest.getHeader("Authorization").substring(7);
             Integer adminUserId = jwtService.extractUserId(token);
 
-            if (adminService.isAdmin(adminUserId)) {
+            if (!adminService.isAdmin(adminUserId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
             }
 
@@ -439,7 +439,7 @@ public class AdminController {
             String token = httpRequest.getHeader("Authorization").substring(7);
             Integer adminUserId = jwtService.extractUserId(token);
 
-            if (adminService.isAdmin(adminUserId)) {
+            if (!adminService.isAdmin(adminUserId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
             }
 
@@ -461,7 +461,7 @@ public class AdminController {
             String token = httpRequest.getHeader("Authorization").substring(7);
             Integer adminUserId = jwtService.extractUserId(token);
 
-            if (adminService.isAdmin(adminUserId)) {
+            if (!adminService.isAdmin(adminUserId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
             }
 
@@ -505,7 +505,7 @@ public class AdminController {
             Integer adminUserId = jwtService.extractUserId(token);
 
             // Verify if the user is an admin
-            if (adminService.isAdmin(adminUserId)) {
+            if (!adminService.isAdmin(adminUserId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
             }
 
@@ -525,7 +525,7 @@ public class AdminController {
             Integer adminUserId = jwtService.extractUserId(token);
 
             // Verify if the user is an admin
-            if (adminService.isAdmin(adminUserId)) {
+            if (!adminService.isAdmin(adminUserId)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
             }
 
