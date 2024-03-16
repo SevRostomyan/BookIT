@@ -1,5 +1,6 @@
 package com.bookit.bookit.service.faktura;
 
+import com.bookit.bookit.dto.InvoiceResponsDTO;
 import com.bookit.bookit.entity.bokning.Bokning;
 import com.bookit.bookit.entity.faktura.Faktura;
 import com.bookit.bookit.entity.kund.Kund;
@@ -27,6 +28,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -164,6 +166,8 @@ public class FakturaService {
                 "Fakturanummer: " + faktura.getId() + "\n" +
                 "Totalbelopp (exkl. moms): " + faktura.getPriceExclVAT() + " kr\n" +
                 "Totalbelopp (inkl. moms): " + faktura.getTotaltBelopp() + " kr\n" +
+                "Förfallodatum: " + faktura.getFörfallodatum() + ".\n" +
+
 
                 // Add more details as needed
                 "\nTack för att du använder vår tjänst.";
@@ -224,9 +228,27 @@ public class FakturaService {
     //Metod för att hämta de genererade fakturaobjekten till frontenden i form av en tabell. Tabellen ska innehålla även sökväg till
     // PDF filen som man kan ladda ner via downloadInvoice endpointen i FakturaController. Kan användas av både Admin och kund:
 
-    public List<Faktura> getInvoicesForCustomer(Integer kundId) {
-        return fakturaRepository.findAllByKundId(kundId);
+    public List<InvoiceResponsDTO> getInvoicesForCustomer(Integer kundId) {
+        List<Faktura> invoices = fakturaRepository.findAllByKundId(kundId);
+        List<InvoiceResponsDTO> invoiceDTOs = new ArrayList<>();
+
+        for (Faktura invoice : invoices) {
+            InvoiceResponsDTO dto = new InvoiceResponsDTO();
+            dto.setId(invoice.getId());
+            dto.setTotaltBelopp(invoice.getTotaltBelopp());
+            dto.setInvoiceDate(invoice.getInvoiceDate());
+            dto.setFörfallodatum(invoice.getFörfallodatum());
+
+            if (invoice.getTjänst() != null) {
+                dto.setTjänstTyp(invoice.getTjänst().getStädningsAlternativ().toString());
+            }
+
+            invoiceDTOs.add(dto);
+        }
+
+        return invoiceDTOs;
     }
+
 
 
 }

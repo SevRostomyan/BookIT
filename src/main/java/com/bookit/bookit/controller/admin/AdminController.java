@@ -529,7 +529,7 @@ public class AdminController {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
             }
 
-            List<Faktura> invoices = fakturaService.getInvoicesForCustomer(request.getKundId());
+            List<InvoiceResponsDTO> invoices = fakturaService.getInvoicesForCustomer(request.getKundId());
             return ResponseEntity.ok(invoices);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving invoices.");

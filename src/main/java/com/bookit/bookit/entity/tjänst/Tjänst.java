@@ -1,6 +1,8 @@
 package com.bookit.bookit.entity.tjänst;
 import com.bookit.bookit.entity.bokning.Bokning;
+import com.bookit.bookit.entity.faktura.Faktura;
 import com.bookit.bookit.enums.StädningsAlternativ;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -23,7 +25,11 @@ public class Tjänst {
     private StädningsAlternativ städningsAlternativ; //BASIC, TOPP, DIAMANT, FÖNSTERTVÄTT
 
     @OneToMany(mappedBy = "tjänst")
-    @JsonManagedReference
+    @JsonIgnore
     private List<Bokning> bokningar;
+
+    @OneToMany(mappedBy = "tjänst")
+    @JsonIgnore
+    private List<Faktura> faktura;
 
 }

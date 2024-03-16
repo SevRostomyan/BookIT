@@ -3,7 +3,7 @@ package com.bookit.bookit.controller.kund;
 import com.bookit.bookit.config.JwtService;
 import com.bookit.bookit.dto.CleaningStatusRequest;
 import com.bookit.bookit.dto.FeedbackRequest;
-import com.bookit.bookit.entity.faktura.Faktura;
+import com.bookit.bookit.dto.InvoiceResponsDTO;
 import com.bookit.bookit.enums.BookingStatus;
 import com.bookit.bookit.service.bokning.BokningService;
 import com.bookit.bookit.service.faktura.FakturaService;
@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 
 import java.util.List;
 
@@ -87,11 +88,10 @@ public class KundController {
             Integer customerId = jwtService.extractUserId(token);
             logger.info("Extracted customer ID from token: {}", customerId);
 
-            // Fetch invoices for the logged-in customer
-            List<Faktura> invoices = fakturaService.getInvoicesForCustomer(customerId);
-            logger.info("Fetched {} invoices for customer ID {}", invoices.size(), customerId);
+            List<InvoiceResponsDTO> invoiceDTOs = fakturaService.getInvoicesForCustomer(customerId);
+            logger.info("Fetched {} invoices for customer ID {}", invoiceDTOs.size(), customerId);
 
-            return ResponseEntity.ok(invoices);
+            return ResponseEntity.ok(invoiceDTOs);
         } catch (Exception e) {
             logger.error("Error retrieving invoices: ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving invoices.");
