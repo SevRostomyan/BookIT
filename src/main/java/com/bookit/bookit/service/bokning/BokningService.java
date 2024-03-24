@@ -382,28 +382,50 @@ public class BokningService {
                 .collect(Collectors.toList());
     }
 
-
     public Map<YearMonth, Integer> calculateMonthlyIncomeFromCompletedBookings(Integer userId) {
         List<Bokning> completedBookings = fetchCompletedBookings(userId);
 
-        return completedBookings.stream()
+        System.out.println("Fetched " + completedBookings.size() + " bookings for user ID: " + userId); // Log the size of fetched bookings
+
+        Map<YearMonth, Integer> monthlyIncome = completedBookings.stream()
                 .collect(Collectors.groupingBy(
                         booking -> YearMonth.from(booking.getBookingTime()),
                         Collectors.summingInt(booking -> tjänstService.getPriceForCleaningType(booking.getTjänst().getStädningsAlternativ()))
                 ));
+
+        System.out.println("Monthly income calculated: " + monthlyIncome); // Log the calculated monthly income
+
+        return monthlyIncome;
     }
 
+
+    //Används i calculateMonthlyIncomeFromCompletedBookings metoden ovan och enbart av städare. Har inget att göra med fetchCompletedBookingsByUserId metoden ovan.
     public List<Bokning> fetchCompletedBookings(Integer userId) {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
-        if (user.getRole().equals(UserRole.KUND)) {
-            return bokningRepository.findAllByKundIdAndBookingStatus(userId, BookingStatus.COMPLETED);
-        } else if (user.getRole().equals(UserRole.STÄDARE)) {
-            return bokningRepository.findAllByStädareIdAndBookingStatus(userId, BookingStatus.COMPLETED);
-        } else {
-            throw new SecurityException("Unauthorized access to fetch bookings.");
+
+        System.out.println("User role for ID " + userId + ": " + user.getRole()); // Log user's role
+
+        if (!user.getRole().equals(UserRole.STÄDARE)) {
+            throw new SecurityException("Unauthorized access to fetch bookings. Only STÄDARE allowed.");
         }
+
+        List<BookingStatus> desiredStatuses = Arrays.asList(
+                BookingStatus.COMPLETED,
+                BookingStatus.UNDERKAND,
+                BookingStatus.NOT_PAID,
+                BookingStatus.PAID);
+
+        System.out.println("Fetching bookings for statuses: " + desiredStatuses); // Log the statuses being fetched
+
+        List<Bokning> bookings = bokningRepository.findAllByStädareIdAndBookingStatusIn(userId, desiredStatuses);
+
+        System.out.println("Bookings fetched: " + bookings); // Log fetched bookings
+
+        return bookings;
     }
+
+
 
 }
 

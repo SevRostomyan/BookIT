@@ -54,4 +54,6 @@ public interface BokningRepository extends JpaRepository<Bokning, Integer> {
 
 
     List<Bokning> findAllByBookingStatus(BookingStatus bookingStatus);
+
+    List<Bokning> findAllByStädareIdAndBookingStatusIn(Integer userId, List<BookingStatus> desiredStatuses);
 }

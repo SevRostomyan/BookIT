@@ -6,12 +6,11 @@ import com.bookit.bookit.entity.tjänst.Tjänst;
 import com.bookit.bookit.enums.BookingStatus;
 import com.bookit.bookit.enums.CleaningReportStatus;
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
+import lombok.ToString;
 import java.time.LocalDateTime;
 
 
@@ -27,16 +26,19 @@ public class Bokning {
     @ManyToOne
     @JoinColumn(name = "kund_id")
     @JsonBackReference
+    @ToString.Exclude // Exclude from toString() to avoid infinite recursion
     private Kund kund;
 
     @ManyToOne
     @JoinColumn(name = "städare_id")
     @JsonBackReference
+    @ToString.Exclude // Exclude from toString() to avoid infinite recursion
     private Städare städare;
 
     @ManyToOne
     @JoinColumn(name = "tjänst_id")
     @JsonBackReference
+    @ToString.Exclude // Exclude from toString() to avoid infinite recursion
     private Tjänst tjänst;
 
     private LocalDateTime bookingTime;

@@ -194,7 +194,7 @@ public class BokningController {
 
 
     //Infon ska visas som en tabell i Städarens Dashboard
-    @PostMapping("/calculateMonthlyIncome")
+    @GetMapping("/calculateMonthlyIncome")
     public ResponseEntity<?> calculateMonthlyIncome(HttpServletRequest httpRequest) {
         try {
             String token = httpRequest.getHeader("Authorization").substring(7);
