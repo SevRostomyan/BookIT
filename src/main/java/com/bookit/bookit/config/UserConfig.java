@@ -68,7 +68,7 @@ public class UserConfig {
                     städareRepository.save(städare);
                 }
 
-                // Hardcoded booking
+                /*// Hardcoded booking
                 Tjänst tjänst = new Tjänst();
                 tjänst.setStädningsAlternativ(StädningsAlternativ.BASIC);  // Hardcoded to BASIC
                 tjänstRepository.save(tjänst);
@@ -80,7 +80,7 @@ public class UserConfig {
                 newBooking.setMessageAtBooking("Your message here");
                 newBooking.setBookingStatus(BookingStatus.PENDING);  // Hardcoded status
                 newBooking.setCleaningReportStatus(CleaningReportStatus.NOT_ASSIGNED);
-                bokningRepository.save(newBooking);
+                bokningRepository.save(newBooking);*/
 
             }
 

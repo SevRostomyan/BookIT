@@ -31,6 +31,7 @@ import com.bookit.bookit.exception.UserNotFoundException;
 
 import java.time.YearMonth;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -499,22 +500,42 @@ public class AdminController {
 
 
     @PostMapping("/generateInvoices")
-    public ResponseEntity<?> generateInvoices(@RequestBody GenerateInvoiceRequest request, HttpServletRequest httpRequest) {
+    public ResponseEntity<Map<String, String>> generateInvoices(@RequestBody GenerateInvoiceRequest request, HttpServletRequest httpRequest) {
         try {
             String token = httpRequest.getHeader("Authorization").substring(7);
             Integer adminUserId = jwtService.extractUserId(token);
 
             // Verify if the user is an admin
             if (!adminService.isAdmin(adminUserId)) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(createResponse("Unauthorized access."));
             }
 
-            fakturaService.generateInvoices(request.getKundId());
-            return ResponseEntity.ok("Invoices generated and sent successfully.");
+            // Call the service method and get the result
+            InvoiceGenerationResult result = fakturaService.generateInvoices(request.getKundId());
+
+            // Determine the response based on the result
+            if (!result.isSuccess()) {
+                HttpStatus status = result.getMessage().equals("No completed bookings available for invoice generation") ?
+                        HttpStatus.BAD_REQUEST : HttpStatus.INTERNAL_SERVER_ERROR;
+                return ResponseEntity.status(status)
+                        .body(createResponse(result.getMessage()));
+            }
+
+            return ResponseEntity.ok(createResponse(result.getMessage()));
         } catch (SecurityException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Unauthorized access.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(createResponse("Unauthorized access."));
+        } catch (Exception e) { // General catch block for unexpected exceptions
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(createResponse("Internal server error due to an unexpected issue: " + e.getMessage()));
         }
     }
+
+    private Map<String, String> createResponse(String message) {
+        return Collections.singletonMap("message", message);
+    }
+
 
 
     //Metod för att hämta de genererade fakturaobjekten till frontenden i form av en tabell. Tabellen ska innehålla även sökväg till

@@ -1,5 +1,6 @@
 package com.bookit.bookit.service.faktura;
 
+import com.bookit.bookit.dto.InvoiceGenerationResult;
 import com.bookit.bookit.dto.InvoiceResponsDTO;
 import com.bookit.bookit.entity.bokning.Bokning;
 import com.bookit.bookit.entity.faktura.Faktura;
@@ -50,78 +51,63 @@ public class FakturaService {
 // Other necessary autowired repositories...
 
 
-    public void generateInvoices(Integer kundId) {
-        // Fetch customer and completed bookings
-        Kund kund = kundRepository.findById(kundId).orElseThrow(() -> new RuntimeException("Kund not found"));
-        List<Bokning> completedBookings = bokningRepository.findAllByKundIdAndBookingStatus(kundId, BookingStatus.COMPLETED);
+    public InvoiceGenerationResult generateInvoices(Integer kundId) {
+        try {
+            // Fetch customer and completed bookings
+            Kund kund = kundRepository.findById(kundId)
+                    .orElseThrow(() -> new RuntimeException("Kund not found"));
+            List<Bokning> completedBookings = bokningRepository.findAllByKundIdAndBookingStatus(kundId, BookingStatus.COMPLETED);
 
-        if (completedBookings.isEmpty()) {
-            throw new RuntimeException("No completed bookings available for invoice generation");
-        }
-
-
-        for (Bokning booking : completedBookings) {
-            StädningsAlternativ alternativ = booking.getTjänst().getStädningsAlternativ();
-            String serviceType = CleaningServiceUtils.getServiceTypeKey(alternativ);
-
-            double pricePerServiceExclVAT = Double.parseDouble(Objects.requireNonNull(env.getProperty(serviceType)));
-            double priceInkVAT = pricePerServiceExclVAT * 1.25; // Including VAT
-
-            Faktura faktura = new Faktura();
-            faktura.setKund(booking.getKund());
-            faktura.setBokning(booking);
-            faktura.setTjänst(booking.getTjänst());
-            faktura.setTotaltBelopp(priceInkVAT);
-            faktura.setPriceExclVAT(pricePerServiceExclVAT);
-            faktura.setInvoiceDate(getNearestWorkingDay(LocalDate.now()));
-            faktura.setFakturanummer(getNextInvoiceNumber());
-
-
-            // Calculate förfallodatum
-            LocalDate invoiceDate = getNearestWorkingDay(LocalDate.now());
-            LocalDate förfallodatum = invoiceDate.plusDays(30); // 30 days payment term
-            faktura.setFörfallodatum(förfallodatum.toString());
-
-
-            // Set company and customer details
-            faktura.setCompanyName("Städafint AB");
-            faktura.setOrganisationalNumber("XXXXXX-XXXX");
-            faktura.setCompanyAddress("X Gatan Y, 752 65, Uppsala");
-
-            faktura.setCustomerFirstName(kund.getFirstname());
-            faktura.setCustomerLastName(kund.getLastname());
-            faktura.setCustomerEmail(kund.getEmail());
-
-
-            try {
-                // Generate PDF and get file object
-                File invoicePdfFile = generateInvoicePdf(faktura);
-
-                // Check if the PDF was successfully generated
-                if (invoicePdfFile != null) {
-                    // Store the file path in the Faktura entity
-                    faktura.setInvoiceFilePath(invoicePdfFile.getAbsolutePath());
-                } else {
-                    // Log the failure to generate PDF
-                    logger.error("PDF generation failed for booking ID: " + booking.getId());
-                    // You can add additional error handling or logging here if needed
-                }
-            } catch (Exception e) {
-                // Handle exceptions that may occur during PDF generation
-                // Log the exception details
-                logger.error("An error occurred during PDF generation for booking ID: " + booking.getId(), e);
-                // You can add additional error handling or logging here if needed
+            if (completedBookings.isEmpty()) {
+                return new InvoiceGenerationResult(false, "No completed bookings available for invoice generation");
             }
 
-            // Save the invoice to the database with the file path
-            fakturaRepository.save(faktura);
+            for (Bokning booking : completedBookings) {
+                StädningsAlternativ alternativ = booking.getTjänst().getStädningsAlternativ();
+                String serviceType = CleaningServiceUtils.getServiceTypeKey(alternativ);
+                double pricePerServiceExclVAT = Double.parseDouble(Objects.requireNonNull(env.getProperty(serviceType)));
+                double priceInkVAT = pricePerServiceExclVAT * 1.25; // Including VAT
 
-            // Prepare and send invoice email
-            prepareAndSendInvoiceEmail(faktura);
+                Faktura faktura = new Faktura();
+                faktura.setKund(booking.getKund());
+                faktura.setBokning(booking);
+                faktura.setTjänst(booking.getTjänst());
+                faktura.setTotaltBelopp(priceInkVAT);
+                faktura.setPriceExclVAT(pricePerServiceExclVAT);
+                faktura.setInvoiceDate(getNearestWorkingDay(LocalDate.now()));
+                faktura.setFakturanummer(getNextInvoiceNumber());
 
-            // Update booking status to NOT_PAID
-            booking.setBookingStatus(BookingStatus.NOT_PAID);
-            bokningRepository.save(booking);
+                // Calculate due date
+                LocalDate förfallodatum = getNearestWorkingDay(LocalDate.now()).plusDays(30); // 30 days payment term
+                faktura.setFörfallodatum(förfallodatum.toString());
+
+                // Set company and customer details
+                faktura.setCompanyName("Städafint AB");
+                faktura.setOrganisationalNumber("XXXXXX-XXXX");
+                faktura.setCompanyAddress("X Gatan Y, 752 65, Uppsala");
+                faktura.setCustomerFirstName(kund.getFirstname());
+                faktura.setCustomerLastName(kund.getLastname());
+                faktura.setCustomerEmail(kund.getEmail());
+
+                try {
+                    File invoicePdfFile = generateInvoicePdf(faktura);
+                    if (invoicePdfFile != null) {
+                        faktura.setInvoiceFilePath(invoicePdfFile.getAbsolutePath());
+                    } else {
+                        logger.error("PDF generation failed for booking ID: " + booking.getId());
+                    }
+                } catch (Exception e) {
+                    logger.error("An error occurred during PDF generation for booking ID: " + booking.getId(), e);
+                }
+
+                fakturaRepository.save(faktura);
+                prepareAndSendInvoiceEmail(faktura);
+                booking.setBookingStatus(BookingStatus.NOT_PAID);
+                bokningRepository.save(booking);
+            }
+            return new InvoiceGenerationResult(true, "Invoices generated and sent successfully.");
+        } catch (Exception e) {
+            return new InvoiceGenerationResult(false, "An unexpected error occurred: " + e.getMessage());
         }
     }
 
