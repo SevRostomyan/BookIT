@@ -22,7 +22,8 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-
+// Här skapas det ett anpassat säkerhetsfilter som hanterar JWT-baserad autentisering för inkommande HTTP-anrop i denna Spring-applikation.
+// Filterklassen använder JwtService för att dekryptera och validera JWT-tokens, och UserDetailsService för att hämta användardetaljer.
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
 

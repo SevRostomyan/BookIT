@@ -27,5 +27,5 @@ public class Admin extends UserEntity {
     private UserEntity user;
     //Kopplat till UserEntity klassen för inloggningssyfte
 
-    //Troligen behöver komplettering
+
 }

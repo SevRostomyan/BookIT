@@ -16,6 +16,11 @@ public class CustomUserDetailsService implements UserDetailsService {
         this.userRepository = userRepository;
     }
 
+
+    //loadUserByUsername försöker hitta en användare med angiven e-post i databasen;
+    // om användaren inte finns kastas ett undantag.
+    // Om användaren finns, returneras ett UserDetails-objekt som innehåller användarens e-post, lösenord och behörigheter,
+    // vilket är nödvändigt för Spring Securitys autentiseringssystem.
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserEntity user = userRepository.findUserByEmail(username)

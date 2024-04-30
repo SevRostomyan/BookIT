@@ -65,7 +65,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         authorize -> authorize.requestMatchers(new AntPathRequestMatcher("/api/auth/**"))
                                 .permitAll()
-                                //Tillfälligt bortkommenterad
                                 .anyRequest()
                                 .authenticated()
                 )
